@@ -10,7 +10,7 @@ import {
 import PatientForm from "../components/PatientForm";
 import AppointmentForm from "../components/AppointmentForm";
 import AppointmentList from "../components/AppointmentList";
-import LogoutButton from "../components/LogoutButton";
+import Navbar from "../components/Navbar";
 import styles from "../css/FrontdeskDashboard.module.css";
 
 export default function FrontdeskDashboard({ user }) {
@@ -45,7 +45,6 @@ export default function FrontdeskDashboard({ user }) {
     loadAppts();
   }
 
-  // Search input (debounced)
   useEffect(() => {
     const delay = setTimeout(async () => {
       if (searchTerm.trim().length > 0) {
@@ -62,15 +61,12 @@ export default function FrontdeskDashboard({ user }) {
 
   return (
     <div className={styles.page}>
-      <LogoutButton />
-
+      <Navbar />
       <div className={styles.materialTable}>
-        {/* ===== Header ===== */}
         <div className={styles.tableHeader}>
           <span className={styles.tableTitle}>Appointments</span>
 
           <div className={styles.actions}>
-            {/* Add patient */}
             <button
               className={styles.iconButton}
               title="Register patient"
@@ -82,7 +78,6 @@ export default function FrontdeskDashboard({ user }) {
               <i className="material-icons">person_add</i>
             </button>
 
-            {/* Add appointment */}
             <button
               className={styles.iconButton}
               title="Add appointment"
@@ -94,7 +89,6 @@ export default function FrontdeskDashboard({ user }) {
               <i className="material-icons">event</i>
             </button>
 
-            {/* Search toggle */}
             <button
               className={styles.iconButton}
               title="Search"
@@ -105,7 +99,6 @@ export default function FrontdeskDashboard({ user }) {
           </div>
         </div>
 
-        {/* ===== Search bar ===== */}
         {showSearch && (
           <div className={styles.searchBar}>
             <input
@@ -135,7 +128,6 @@ export default function FrontdeskDashboard({ user }) {
           </div>
         )}
 
-        {/* ===== Appointment Table ===== */}
         <div className={styles.tableContent}>
           <AppointmentList
             appts={appts}
@@ -151,7 +143,6 @@ export default function FrontdeskDashboard({ user }) {
         </div>
       </div>
 
-      {/* ===== Register Patient Modal ===== */}
       {showPatientForm && (
         <div className={styles.formCard}>
           <h3>Register Patient</h3>
@@ -159,7 +150,6 @@ export default function FrontdeskDashboard({ user }) {
         </div>
       )}
 
-      {/* ===== Add Appointment Modal ===== */}
       {showApptForm && (
         <div className={styles.formCard}>
           <h3>Add Appointment</h3>
