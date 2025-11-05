@@ -1,5 +1,5 @@
 -- init_db.sql
-CREATE DATABASE if NOT EXISTS clinicdb;
+CREATE DATABASE IF NOT EXISTS clinicdb;
 USE clinicdb;
 
 -- Doctor
@@ -22,12 +22,13 @@ CREATE TABLE Patient (
     Height DECIMAL(5,2),
     Weight DECIMAL(5,2),
     BMI DECIMAL(5,2),
-    Blood_Group VARCHAR(5),
+    Blood_Group ENUM('A+','A-','B+','B-','O+','O-','AB+','AB-'),
     Phone_Number VARCHAR(15) UNIQUE,
     Mothers_Name VARCHAR(100),
     Fathers_Name VARCHAR(100),
     Profession VARCHAR(100),
-    Portfolio TEXT
+    Portfolio TEXT,
+    FULLTEXT KEY idx_patient_name (Name)
 );
 
 -- Medicine

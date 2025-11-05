@@ -51,15 +51,7 @@ export default function AppointmentList({ appts, onEdit, onDelete }) {
                 <td>
                   <button
                     className={styles.actionBtn}
-                    onClick={() => {
-                      const newStatus = prompt(
-                        "Edit appointment status (Scheduled / Completed / Cancelled):",
-                        a.Status
-                      );
-                      if (newStatus) {
-                        onEdit(a.Appt_ID, { ...a, Status: newStatus });
-                      }
-                    }}
+                    onClick={() => onEdit(a)}
                   >
                     Edit
                   </button>

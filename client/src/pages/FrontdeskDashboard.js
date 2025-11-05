@@ -27,6 +27,7 @@ export default function FrontdeskDashboard({ user }) {
   const [showPatientModal, setShowPatientModal] = useState(false);
   const [showApptModal, setShowApptModal] = useState(false);
   const [doctors, setDoctors] = useState([]);
+  const [editingAppt, setEditingAppt] = useState(null);
 
   useEffect(() => {
     async function fetchDoctors() {
@@ -151,10 +152,7 @@ export default function FrontdeskDashboard({ user }) {
         <div className={styles.tableContent}>
           <AppointmentList
             appts={appts}
-            onEdit={async (id, data) => {
-              await editAppointment(id, data);
-              loadAppts();
-            }}
+            onEdit={(appt) => setEditingAppt(appt)}
             onDelete={async (id) => {
               await deleteAppointment(id);
               loadAppts();
@@ -198,6 +196,27 @@ export default function FrontdeskDashboard({ user }) {
         />
       )}
 
+      {(showApptModal || editingAppt) && (
+        <AppointmentFormModal
+          doctors={doctors}
+          onClose={() => {
+            setShowApptModal(false);
+            setEditingAppt(null);
+          }}
+          onSubmit={async (data) => {
+            await handleCreateAppt(data);
+            setShowApptModal(false);
+          }}
+          onUpdate={async (id, data) => {
+            await editAppointment(id, data);
+            loadAppts();
+            setEditingAppt(null);
+            alert("Appointment updated successfully!");
+          }}
+          editData={editingAppt}
+        />
+      )}
+      
     </div>
   );
 }
