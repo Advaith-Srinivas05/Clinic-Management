@@ -11,6 +11,7 @@ const prescRoutes = require('./routes/prescriptions');
 const paymentRoutes = require('./routes/payments');
 const medRoutes = require('./routes/medicines');
 const adminRoutes = require('./routes/admin');
+const doctorRoutes = require("./routes/doctors");
 
 const app = express();
 app.use(cors());
@@ -23,6 +24,7 @@ app.use('/prescriptions', prescRoutes);
 app.use('/payments', paymentRoutes);
 app.use('/medicines', medRoutes);
 app.use('/admin', adminRoutes);
+app.use("/api/doctors", doctorRoutes);
 
 const PORT = process.env.PORT || 4000;
 app.listen(PORT, () => console.log(`Server running on port ${PORT}`));

@@ -10,6 +10,8 @@ import {
 import PatientForm from "../components/PatientForm";
 import AppointmentForm from "../components/AppointmentForm";
 import AppointmentList from "../components/AppointmentList";
+import PatientFormModal from "../components/PatientFormModal";
+import AppointmentFormModal from "../components/AppointmentFormModal";
 import Navbar from "../components/Navbar";
 import styles from "../css/FrontdeskDashboard.module.css";
 
@@ -22,6 +24,18 @@ export default function FrontdeskDashboard({ user }) {
   const [searchTerm, setSearchTerm] = useState("");
   const [searchResults, setSearchResults] = useState([]);
   const [loading, setLoading] = useState(false);
+  const [showPatientModal, setShowPatientModal] = useState(false);
+  const [showApptModal, setShowApptModal] = useState(false);
+  const [doctors, setDoctors] = useState([]);
+
+  useEffect(() => {
+    async function fetchDoctors() {
+      const res = await fetch("http://localhost:4000/api/doctors");
+      const data = await res.json();
+      setDoctors(data);
+    }
+    fetchDoctors();
+  }, []);
 
   useEffect(() => {
     loadAppts();
@@ -70,21 +84,15 @@ export default function FrontdeskDashboard({ user }) {
             <button
               className={styles.iconButton}
               title="Register patient"
-              onClick={() => {
-                setShowPatientForm(!showPatientForm);
-                setShowApptForm(false);
-              }}
+              onClick={() => setShowPatientModal(true)}
             >
               <i className="material-icons">person_add</i>
             </button>
-
+            
             <button
               className={styles.iconButton}
               title="Add appointment"
-              onClick={() => {
-                setShowApptForm(!showApptForm);
-                setShowPatientForm(false);
-              }}
+              onClick={() => setShowApptModal(true)}
             >
               <i className="material-icons">event</i>
             </button>
@@ -156,6 +164,28 @@ export default function FrontdeskDashboard({ user }) {
           <AppointmentForm onSubmit={handleCreateAppt} />
         </div>
       )}
+
+      {showPatientModal && (
+        <PatientFormModal
+          onClose={() => setShowPatientModal(false)}
+          onSubmit={(data) => {
+            handleAddPatient(data);
+            setShowPatientModal(false);
+          }}
+        />
+      )}
+
+      {showApptModal && (
+        <AppointmentFormModal
+          doctors={doctors}
+          onClose={() => setShowApptModal(false)}
+          onSubmit={(data) => {
+            handleCreateAppt(data);
+            setShowApptModal(false);
+          }}
+        />
+      )}
+
     </div>
   );
 }
