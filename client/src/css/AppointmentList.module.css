@@ -2,12 +2,37 @@
 
 .tableWrapper {
   width: 100%;
-  overflow-x: auto;
   background: #fff;
   border-radius: 8px;
   box-shadow: 0 2px 5px rgba(0, 0, 0, 0.08);
+  overflow: hidden;
+  display: flex;
+  flex-direction: column;
 }
 
+.scrollContainer {
+  max-height: calc(100vh - 250px); /* adjust based on navbar height */
+  overflow-y: auto;
+  overflow-x: auto;
+  scrollbar-width: thin;
+  scrollbar-color: #ccc transparent;
+}
+
+.scrollContainer::-webkit-scrollbar {
+  width: 8px;
+  height: 8px;
+}
+
+.scrollContainer::-webkit-scrollbar-thumb {
+  background: #bbb;
+  border-radius: 4px;
+}
+
+.scrollContainer::-webkit-scrollbar-thumb:hover {
+  background: #999;
+}
+
+/* ===== Table structure ===== */
 .table {
   width: 100%;
   border-collapse: collapse;
@@ -17,6 +42,9 @@
 .table thead {
   background-color: #f8f9fa;
   text-align: left;
+  position: sticky;
+  top: 0;
+  z-index: 5;
 }
 
 .table th {
@@ -27,6 +55,7 @@
   letter-spacing: 0.03em;
   padding: 14px 16px;
   border-bottom: 1px solid #e0e0e0;
+  background-color: #f8f9fa;
 }
 
 .table td {
@@ -46,7 +75,6 @@
   transition: background 0.2s;
 }
 
-/* Status pills */
 .status {
   padding: 4px 10px;
   border-radius: 12px;
@@ -69,7 +97,6 @@
   color: #1565c0;
 }
 
-/* Action buttons */
 .actionBtn {
   border: none;
   background: none;
@@ -94,7 +121,6 @@
   background: rgba(211, 47, 47, 0.1);
 }
 
-/* Empty message */
 .empty {
   text-align: center;
   padding: 30px;

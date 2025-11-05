@@ -4,6 +4,7 @@
   position: relative;
   background: #f5f7fa;
   min-height: 100vh;
+  box-sizing: border-box;
 }
 
 .materialTable {
@@ -58,6 +59,7 @@
   border-radius: 6px;
   border: 1px solid #ccc;
   font-size: 14px;
+  box-sizing: border-box;
 }
 
 .loading {
