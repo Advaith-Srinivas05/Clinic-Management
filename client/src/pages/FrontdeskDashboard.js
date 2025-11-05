@@ -63,13 +63,25 @@ export default function FrontdeskDashboard({ user }) {
     const delay = setTimeout(async () => {
       if (searchTerm.trim().length > 0) {
         setLoading(true);
-        const res = await searchPatients(searchTerm);
-        setSearchResults(res);
-        setLoading(false);
+        try {
+          const res = await fetch(
+            `http://localhost:4000/appointments/search?q=${encodeURIComponent(
+              searchTerm
+            )}`
+          );
+          const data = await res.json();
+          setAppts(data); // ✅ dynamically updates table
+        } catch (err) {
+          console.error("Search error:", err);
+        } finally {
+          setLoading(false);
+        }
       } else {
-        setSearchResults([]);
+        // If search is cleared, reload all appointments
+        loadAppts();
       }
-    }, 300);
+    }, 400);
+
     return () => clearTimeout(delay);
   }, [searchTerm]);
 

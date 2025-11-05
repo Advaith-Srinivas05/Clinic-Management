@@ -48,3 +48,6 @@ export const admin = {
   createDoctor: (d) => req('/admin/create-doctor', { method: 'POST', body: JSON.stringify(d) }),
   logins: () => req('/admin/logins')
 };
+
+export const searchAppointments = (q) =>
+  req(`/appointments/search?q=${encodeURIComponent(q)}`);

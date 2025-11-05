@@ -70,4 +70,48 @@ router.delete('/:id', async (req, res) => {
   } catch (err) { console.error(err); res.status(500).json({ error: 'Server error' }); }
 });
 
+// Search appointments by patient name (sorted by relevance)
+router.get("/search", async (req, res) => {
+  const { q } = req.query;
+  if (!q || q.trim().length === 0)
+    return res.status(400).json({ error: "Query parameter 'q' required" });
+
+  try {
+    // If FULLTEXT is available (recommended):
+    // CREATE FULLTEXT INDEX idx_patient_name ON Patient(Name);
+    const sql = `
+      SELECT 
+        a.*, 
+        p.Name AS PatientName, 
+        d.Name AS DoctorName,
+        MATCH(p.Name) AGAINST(? IN NATURAL LANGUAGE MODE) AS relevance
+      FROM Appointments a
+      LEFT JOIN Patient p ON a.Patient_ID = p.Patient_ID
+      LEFT JOIN Doctor d ON a.Doctor_ID = d.Doctor_ID
+      WHERE MATCH(p.Name) AGAINST(? IN NATURAL LANGUAGE MODE)
+      ORDER BY relevance DESC, a.Date ASC, a.Time ASC;
+    `;
+
+    const [rows] = await pool.query(sql, [q, q]);
+    if (rows.length === 0) {
+      // fallback if FULLTEXT not supported
+      const likeSql = `
+        SELECT 
+          a.*, p.Name AS PatientName, d.Name AS DoctorName
+        FROM Appointments a
+        LEFT JOIN Patient p ON a.Patient_ID = p.Patient_ID
+        LEFT JOIN Doctor d ON a.Doctor_ID = d.Doctor_ID
+        WHERE p.Name LIKE ?
+        ORDER BY a.Date ASC, a.Time ASC;
+      `;
+      const [likeRows] = await pool.query(likeSql, [`%${q}%`]);
+      return res.json(likeRows);
+    }
+    res.json(rows);
+  } catch (err) {
+    console.error("Error searching appointments:", err);
+    res.status(500).json({ error: "Server error while searching appointments" });
+  }
+});
+
 module.exports = router;
