@@ -11,12 +11,14 @@ import PatientForm from "../components/PatientForm";
 import AppointmentForm from "../components/AppointmentForm";
 import AppointmentList from "../components/AppointmentList";
 import LogoutButton from "../components/LogoutButton";
+import styles from "../css/FrontdeskDashboard.module.css";
 
 export default function FrontdeskDashboard({ user }) {
   const [appts, setAppts] = useState([]);
   const [filters, setFilters] = useState({});
   const [showPatientForm, setShowPatientForm] = useState(false);
   const [showApptForm, setShowApptForm] = useState(false);
+  const [showSearch, setShowSearch] = useState(false);
   const [searchTerm, setSearchTerm] = useState("");
   const [searchResults, setSearchResults] = useState([]);
   const [loading, setLoading] = useState(false);
@@ -32,7 +34,7 @@ export default function FrontdeskDashboard({ user }) {
 
   async function handleAddPatient(data) {
     await createPatient(data);
-    alert("Patient added successfully!");
+    alert("Patient registered successfully!");
     setShowPatientForm(false);
   }
 
@@ -43,9 +45,9 @@ export default function FrontdeskDashboard({ user }) {
     loadAppts();
   }
 
-  // 🔍 Dynamic search
+  // Search input (debounced)
   useEffect(() => {
-    const delayDebounce = setTimeout(async () => {
+    const delay = setTimeout(async () => {
       if (searchTerm.trim().length > 0) {
         setLoading(true);
         const res = await searchPatients(searchTerm);
@@ -55,157 +57,115 @@ export default function FrontdeskDashboard({ user }) {
         setSearchResults([]);
       }
     }, 300);
-    return () => clearTimeout(delayDebounce);
+    return () => clearTimeout(delay);
   }, [searchTerm]);
 
   return (
-    <div style={{ position: "relative", padding: 20 }}>
-      <div
-        style={{
-          display: "flex",
-          justifyContent: "space-between",
-          alignItems: "center",
-          marginBottom: 20,
-          flexWrap: "wrap",
-          gap: "10px",
-        }}
-      >
-        <div style={{ display: "flex", gap: "10px" }}>
-          <button
-            onClick={() => {
-              setShowPatientForm(!showPatientForm);
-              setShowApptForm(false);
-            }}
-            style={{
-              padding: "8px 16px",
-              borderRadius: "6px",
-              background: "#4caf50",
-              color: "white",
-              border: "none",
-              cursor: "pointer",
-            }}
-          >
-            {showPatientForm ? "Close" : "Register Patient"}
-          </button>
+    <div className={styles.page}>
+      <LogoutButton />
 
-          <button
-            onClick={() => {
-              setShowApptForm(!showApptForm);
-              setShowPatientForm(false);
-            }}
-            style={{
-              padding: "8px 16px",
-              borderRadius: "6px",
-              background: "#1976d2",
-              color: "white",
-              border: "none",
-              cursor: "pointer",
-            }}
-          >
-            {showApptForm ? "Close" : "Add Appointment"}
-          </button>
-        </div>
+      <div className={styles.materialTable}>
+        {/* ===== Header ===== */}
+        <div className={styles.tableHeader}>
+          <span className={styles.tableTitle}>Appointments</span>
 
-        {/* 🔍 Search Bar */}
-        <div style={{ position: "relative", width: "300px", marginRight: "60px" }}>
-          <input
-            type="text"
-            placeholder="Search patient..."
-            value={searchTerm}
-            onChange={(e) => setSearchTerm(e.target.value)}
-            style={{
-              width: "100%",
-              padding: "8px",
-              borderRadius: "6px",
-              border: "1px solid #ccc",
-            }}
-          />
-          {searchTerm && searchResults.length > 0 && (
-            <div
-              style={{
-                position: "absolute",
-                top: "38px",
-                left: 0,
-                width: "100%",
-                background: "white",
-                border: "1px solid #ccc",
-                borderRadius: "6px",
-                maxHeight: "200px",
-                overflowY: "auto",
-                zIndex: 100,
+          <div className={styles.actions}>
+            {/* Add patient */}
+            <button
+              className={styles.iconButton}
+              title="Register patient"
+              onClick={() => {
+                setShowPatientForm(!showPatientForm);
+                setShowApptForm(false);
               }}
             >
-              {searchResults.map((p) => (
-                <div
-                  key={p.Patient_ID}
-                  style={{
-                    padding: "6px 10px",
-                    cursor: "pointer",
-                    borderBottom: "1px solid #eee",
-                  }}
-                  onClick={() => {
-                    alert(`Patient selected: ${p.Name}`);
-                    setSearchTerm("");
-                    setSearchResults([]);
-                  }}
-                >
-                  {p.Name} — {p.Phone_Number}
-                </div>
-              ))}
-              {loading && <div style={{ padding: "6px 10px" }}>Loading...</div>}
-            </div>
-          )}
+              <i className="material-icons">person_add</i>
+            </button>
+
+            {/* Add appointment */}
+            <button
+              className={styles.iconButton}
+              title="Add appointment"
+              onClick={() => {
+                setShowApptForm(!showApptForm);
+                setShowPatientForm(false);
+              }}
+            >
+              <i className="material-icons">event</i>
+            </button>
+
+            {/* Search toggle */}
+            <button
+              className={styles.iconButton}
+              title="Search"
+              onClick={() => setShowSearch(!showSearch)}
+            >
+              <i className="material-icons">search</i>
+            </button>
+          </div>
         </div>
 
-        <LogoutButton />
+        {/* ===== Search bar ===== */}
+        {showSearch && (
+          <div className={styles.searchBar}>
+            <input
+              type="text"
+              placeholder="Search by name or phone..."
+              value={searchTerm}
+              onChange={(e) => setSearchTerm(e.target.value)}
+            />
+            {loading && <div className={styles.loading}>Searching...</div>}
+            {searchResults.length > 0 && (
+              <div className={styles.searchDropdown}>
+                {searchResults.map((p) => (
+                  <div
+                    key={p.Patient_ID}
+                    className={styles.searchItem}
+                    onClick={() => {
+                      alert(`Selected Patient: ${p.Name}`);
+                      setSearchTerm("");
+                      setSearchResults([]);
+                    }}
+                  >
+                    {p.Name} — {p.Phone_Number}
+                  </div>
+                ))}
+              </div>
+            )}
+          </div>
+        )}
+
+        {/* ===== Appointment Table ===== */}
+        <div className={styles.tableContent}>
+          <AppointmentList
+            appts={appts}
+            onEdit={async (id, data) => {
+              await editAppointment(id, data);
+              loadAppts();
+            }}
+            onDelete={async (id) => {
+              await deleteAppointment(id);
+              loadAppts();
+            }}
+          />
+        </div>
       </div>
 
-      {/* ===== Forms (modals) ===== */}
+      {/* ===== Register Patient Modal ===== */}
       {showPatientForm && (
-        <div
-          style={{
-            background: "#f8f9fa",
-            padding: 20,
-            borderRadius: 10,
-            marginBottom: 20,
-            boxShadow: "0 2px 5px rgba(0,0,0,0.1)",
-          }}
-        >
+        <div className={styles.formCard}>
           <h3>Register Patient</h3>
           <PatientForm onSubmit={handleAddPatient} />
         </div>
       )}
 
+      {/* ===== Add Appointment Modal ===== */}
       {showApptForm && (
-        <div
-          style={{
-            background: "#f8f9fa",
-            padding: 20,
-            borderRadius: 10,
-            marginBottom: 20,
-            boxShadow: "0 2px 5px rgba(0,0,0,0.1)",
-          }}
-        >
+        <div className={styles.formCard}>
           <h3>Add Appointment</h3>
           <AppointmentForm onSubmit={handleCreateAppt} />
         </div>
       )}
-
-      {/* ===== Main Appointment List ===== */}
-      <div style={{ marginTop: 10 }}>
-        <h2>Appointments</h2>
-        <AppointmentList
-          appts={appts}
-          onEdit={async (id, data) => {
-            await editAppointment(id, data);
-            loadAppts();
-          }}
-          onDelete={async (id) => {
-            await deleteAppointment(id);
-            loadAppts();
-          }}
-        />
-      </div>
     </div>
   );
 }
