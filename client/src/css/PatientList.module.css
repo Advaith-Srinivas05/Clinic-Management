@@ -1,0 +1,129 @@
+@import url("https://fonts.googleapis.com/css2?family=Roboto:wght@400;500;700&display=swap");
+
+.tableWrapper {
+  width: 100%;
+  background: #fff;
+  border-radius: 8px;
+  box-shadow: 0 2px 5px rgba(0, 0, 0, 0.08);
+  overflow: hidden;
+  display: flex;
+  flex-direction: column;
+}
+
+.scrollContainer {
+  max-height: calc(100vh - 250px); /* adjust based on navbar height */
+  overflow-y: auto;
+  overflow-x: auto;
+  scrollbar-width: thin;
+  scrollbar-color: #ccc transparent;
+}
+
+.scrollContainer::-webkit-scrollbar {
+  width: 8px;
+  height: 8px;
+}
+
+.scrollContainer::-webkit-scrollbar-thumb {
+  background: #bbb;
+  border-radius: 4px;
+}
+
+.scrollContainer::-webkit-scrollbar-thumb:hover {
+  background: #999;
+}
+
+/* ===== Table structure ===== */
+.table {
+  width: 100%;
+  border-collapse: collapse;
+  font-family: "Roboto", sans-serif;
+}
+
+.table thead {
+  background-color: #f8f9fa;
+  text-align: left;
+  position: sticky;
+  top: 0;
+  z-index: 5;
+}
+
+.table th {
+  font-size: 13px;
+  font-weight: 600;
+  color: #555;
+  text-transform: uppercase;
+  letter-spacing: 0.03em;
+  padding: 14px 16px;
+  border-bottom: 1px solid #e0e0e0;
+  background-color: #f8f9fa;
+}
+
+.table td {
+  font-size: 14px;
+  color: #222;
+  padding: 14px 16px;
+  border-bottom: 1px solid #eee;
+  white-space: nowrap;
+}
+
+.table tr:last-child td {
+  border-bottom: none;
+}
+
+.table tbody tr:hover {
+  background-color: #f6f6f6;
+  transition: background 0.2s;
+}
+
+.status {
+  padding: 4px 10px;
+  border-radius: 12px;
+  font-size: 12px;
+  font-weight: 600;
+}
+
+.completed {
+  background-color: #e0f8e0;
+  color: #2e7d32;
+}
+
+.cancelled {
+  background-color: #ffeaea;
+  color: #c62828;
+}
+
+.scheduled {
+  background-color: #e3f2fd;
+  color: #1565c0;
+}
+
+.actionBtn {
+  border: none;
+  background: none;
+  color: #1976d2;
+  cursor: pointer;
+  margin-right: 8px;
+  font-size: 13px;
+  padding: 5px 8px;
+  border-radius: 4px;
+  transition: all 0.2s;
+}
+
+.actionBtn:hover {
+  background: rgba(25, 118, 210, 0.1);
+}
+
+.deleteBtn {
+  color: #d32f2f;
+}
+
+.deleteBtn:hover {
+  background: rgba(211, 47, 47, 0.1);
+}
+
+.empty {
+  text-align: center;
+  padding: 30px;
+  color: #666;
+  font-size: 15px;
+}

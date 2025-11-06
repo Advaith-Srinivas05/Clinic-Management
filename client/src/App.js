@@ -3,16 +3,9 @@ import { Routes, Route, Navigate } from "react-router-dom";
 import Login from "./pages/Login";
 import FrontdeskDashboard from "./pages/FrontdeskDashboard";
 import FrontdeskPatientSearch from "./pages/FrontdeskPatientSearch";
+import DoctorDashboard from "./pages/DoctorDashboard"
+import AdminDashboard from "./pages/AdminDashboard"
 
-// Placeholder components for now
-function DoctorDashboard() {
-  return <h2 style={{ padding: "2rem" }}>Doctor Dashboard (Coming soon)</h2>;
-}
-function AdminDashboard() {
-  return <h2 style={{ padding: "2rem" }}>Admin Dashboard (Coming soon)</h2>;
-}
-
-// Helper: redirects to proper home route by role
 function RoleRedirect() {
   const role = localStorage.getItem("role");
   if (role === "FrontDesk") return <Navigate to="/frontdesk/appointments" />;
