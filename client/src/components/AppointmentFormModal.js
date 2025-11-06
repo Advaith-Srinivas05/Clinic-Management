@@ -48,8 +48,15 @@ export default function AppointmentFormModal({
   // 🔘 Submit handler
   const handleSubmit = (e) => {
     e.preventDefault();
+    
+    // Form validation
     if (!selectedPatient) {
-      alert("Please select a patient.");
+      alert("Please select a patient");
+      return;
+    }
+    
+    if (!form.Date || !form.Time) {
+      alert("Please fill in all required fields");
       return;
     }
 
@@ -58,23 +65,8 @@ export default function AppointmentFormModal({
       Patient_ID: selectedPatient.Patient_ID,
     };
 
-    if (isEdit) {
-      onUpdate(editData.Appt_ID, payload);
-    } else {
-      onSubmit(payload);
-    }
-
-    // Reset and close
-    setForm({
-      Doctor_ID: doctors[0]?.Doctor_ID || "",
-      Patient_ID: "",
-      Date: "",
-      Time: "",
-      Cause_of_Visit: "",
-    });
-    setSearchTerm("");
-    setSelectedPatient(null);
-    onClose();
+    // Call the parent's onSubmit handler
+    onSubmit(payload);
   };
 
   return (
@@ -134,6 +126,7 @@ export default function AppointmentFormModal({
                     if (selectedPatient) setSelectedPatient(null);
                   }}
                   disabled={isEdit && selectedPatient} // avoid changing patient in edit
+                  required
                 />
                 {loading && (
                   <div className={styles.loading}>Searching...</div>
@@ -173,6 +166,7 @@ export default function AppointmentFormModal({
                   value={form.Date}
                   onChange={(e) => setForm({ ...form, Date: e.target.value })}
                   required
+                  min={new Date().toISOString().split('T')[0]} // Prevent past dates
                 />
               </div>
               <div>

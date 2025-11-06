@@ -1,8 +1,8 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import styles from "../css/PatientFormModal.module.css";
 import registerImg from "../img/register.png";
 
-export default function PatientFormModal({ onClose, onSubmit }) {
+export default function PatientFormModal({ onClose, onSubmit, editData }) {
   const [form, setForm] = useState({
     Name: "",
     DOB: "",
@@ -16,6 +16,30 @@ export default function PatientFormModal({ onClose, onSubmit }) {
     Profession: "",
     Portfolio: "",
   });
+
+  // Initialize form with editData if it exists
+  useEffect(() => {
+    if (editData) {
+      // Format the date for the date input (YYYY-MM-DD)
+      const formattedDate = editData.DOB 
+        ? new Date(editData.DOB).toISOString().split('T')[0]
+        : '';
+      
+      setForm({
+        Name: editData.Name || "",
+        DOB: formattedDate,
+        Gender: editData.Gender || "Male",
+        Height: editData.Height || "",
+        Weight: editData.Weight || "",
+        Blood_Group: editData.Blood_Group || "A+",
+        Phone_Number: editData.Phone_Number || "",
+        Mothers_Name: editData.Mothers_Name || "",
+        Fathers_Name: editData.Fathers_Name || "",
+        Profession: editData.Profession || "",
+        Portfolio: editData.Portfolio || "",
+      });
+    }
+  }, [editData]);
 
   const handleChange = (e) => {
     setForm({ ...form, [e.target.name]: e.target.value });
@@ -46,7 +70,7 @@ export default function PatientFormModal({ onClose, onSubmit }) {
         {/* Right Panel */}
         <div className={styles.rightContainer}>
           <header>
-            <h1>Register New Patient</h1>
+            <h1>{editData ? 'Edit Patient' : 'Register New Patient'}</h1>
           </header>
 
           <form onSubmit={handleSubmit}>
@@ -202,7 +226,7 @@ export default function PatientFormModal({ onClose, onSubmit }) {
                 Cancel
               </button>
               <button type="submit" className={styles.submit}>
-                Add Patient
+                {editData ? 'Save Changes' : 'Add Patient'}
               </button>
             </footer>
           </form>

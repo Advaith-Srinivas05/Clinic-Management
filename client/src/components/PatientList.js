@@ -1,10 +1,32 @@
-import React from "react";
+import React, { useState } from "react";
 import styles from "../css/PatientList.module.css";
+import ConfirmationModal from "./ConfirmationModal";
 
 export default function PatientList({ patients, onEdit, onDelete }) {
+  const [showDeleteModal, setShowDeleteModal] = useState(false);
+  const [patientToDelete, setPatientToDelete] = useState(null);
+
   if (!patients || patients.length === 0) {
     return <div className={styles.empty}>No patients found.</div>;
   }
+
+  const handleDeleteClick = (patient) => {
+    setPatientToDelete(patient);
+    setShowDeleteModal(true);
+  };
+
+  const confirmDelete = () => {
+    if (patientToDelete) {
+      onDelete(patientToDelete.Patient_ID);
+      setShowDeleteModal(false);
+      setPatientToDelete(null);
+    }
+  };
+
+  const cancelDelete = () => {
+    setShowDeleteModal(false);
+    setPatientToDelete(null);
+  };
 
   return (
     <div className={styles.tableWrapper}>
@@ -44,10 +66,7 @@ export default function PatientList({ patients, onEdit, onDelete }) {
                   </button>
                   <button
                     className={`${styles.actionBtn} ${styles.deleteBtn}`}
-                    onClick={() => {
-                      if (window.confirm("Delete this patient?"))
-                        onDelete(p.Patient_ID);
-                    }}
+                    onClick={() => handleDeleteClick(p)}
                   >
                     Delete
                   </button>
@@ -57,6 +76,13 @@ export default function PatientList({ patients, onEdit, onDelete }) {
           </tbody>
         </table>
       </div>
+      <ConfirmationModal
+        isOpen={showDeleteModal}
+        onClose={cancelDelete}
+        onConfirm={confirmDelete}
+        title="Delete Patient"
+        message={`Are you sure you want to delete ${patientToDelete?.Name}? This action cannot be undone.`}
+      />
     </div>
   );
 }

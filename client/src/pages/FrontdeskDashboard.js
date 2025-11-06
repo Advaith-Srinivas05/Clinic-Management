@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useCallback } from "react";
 import {
   createPatient,
   searchPatients,
@@ -13,6 +13,7 @@ import AppointmentList from "../components/AppointmentList";
 import PatientFormModal from "../components/PatientFormModal";
 import AppointmentFormModal from "../components/AppointmentFormModal";
 import Navbar from "../components/Navbar";
+import ConfirmationModal from "../components/ConfirmationModal";
 import styles from "../css/FrontdeskDashboard.module.css";
 
 export default function FrontdeskDashboard({ user }) {
@@ -28,6 +29,14 @@ export default function FrontdeskDashboard({ user }) {
   const [showApptModal, setShowApptModal] = useState(false);
   const [doctors, setDoctors] = useState([]);
   const [editingAppt, setEditingAppt] = useState(null);
+  const [modalConfig, setModalConfig] = useState({
+    isOpen: false,
+    message: "",
+    onConfirm: null,
+    onCancel: null,
+    showCancel: false,
+    confirmText: "OK"
+  });
 
   useEffect(() => {
     async function fetchDoctors() {
@@ -47,17 +56,36 @@ export default function FrontdeskDashboard({ user }) {
     setAppts(list);
   }
 
+  const showModal = useCallback((message, onConfirm = null, options = {}) => {
+    setModalConfig({
+      isOpen: true,
+      message,
+      onConfirm: onConfirm || (() => setModalConfig(prev => ({ ...prev, isOpen: false }))),
+      onCancel: () => setModalConfig(prev => ({ ...prev, isOpen: false })),
+      showCancel: options.showCancel || false,
+      confirmText: options.confirmText || "OK"
+    });
+  }, []);
+
   async function handleAddPatient(data) {
-    await createPatient(data);
-    alert("Patient registered successfully!");
-    setShowPatientForm(false);
+    try {
+      await createPatient(data);
+      showModal("Patient registered successfully!");
+      setShowPatientModal(false);
+    } catch (error) {
+      showModal(error.message || "Failed to register patient");
+    }
   }
 
   async function handleCreateAppt(data) {
-    await createAppointment(data);
-    alert("Appointment created successfully!");
-    setShowApptForm(false);
-    loadAppts();
+    try {
+      await createAppointment(data);
+      showModal("Appointment created successfully!");
+      setShowApptModal(false);
+      loadAppts();
+    } catch (error) {
+      showModal(error.message || "Failed to create appointment");
+    }
   }
 
   useEffect(() => {
@@ -71,7 +99,7 @@ export default function FrontdeskDashboard({ user }) {
             )}`
           );
           const data = await res.json();
-          setAppts(data); // ✅ dynamically updates table
+          setAppts(data); // dynamically updates table
         } catch (err) {
           console.error("Search error:", err);
         } finally {
@@ -85,6 +113,35 @@ export default function FrontdeskDashboard({ user }) {
 
     return () => clearTimeout(delay);
   }, [searchTerm]);
+
+  const deleteAppointment = async (id) => {
+    try {
+      const response = await fetch(`http://localhost:4000/appointments/${id}`, {
+        method: 'DELETE',
+      });
+      
+      if (!response.ok) {
+        let errorMessage = 'Failed to delete appointment';
+        try {
+          const errorData = await response.text();
+          if (errorData) {
+            const jsonError = JSON.parse(errorData);
+            errorMessage = jsonError.message || errorMessage;
+          }
+        } catch (e) {
+          console.error('Error parsing error response:', e);
+        }
+        throw new Error(errorMessage);
+      }
+      
+      // Update the appointments list by filtering out the deleted appointment
+      setAppts(appts.filter(appt => appt.Appt_ID !== id));
+      return true;
+    } catch (err) {
+      showModal(err.message || 'Error deleting appointment. Please try again.');
+      throw err;
+    }
+  };
 
   return (
     <div className={styles.page}>
@@ -153,9 +210,18 @@ export default function FrontdeskDashboard({ user }) {
           <AppointmentList
             appts={appts}
             onEdit={(appt) => setEditingAppt(appt)}
-            onDelete={async (id) => {
-              await deleteAppointment(id);
-              loadAppts();
+            onDelete={(id) => {
+              showModal(
+                "Are you sure you want to delete this appointment?",
+                async () => {
+                  try {
+                    await deleteAppointment(id);
+                  } catch (err) {
+                    console.error('Error in onDelete handler:', err);
+                  }
+                },
+                { showCancel: true, confirmText: "Delete" }
+              );
             }}
           />
         </div>
@@ -185,17 +251,6 @@ export default function FrontdeskDashboard({ user }) {
         />
       )}
 
-      {showApptModal && (
-        <AppointmentFormModal
-          doctors={doctors}
-          onClose={() => setShowApptModal(false)}
-          onSubmit={(data) => {
-            handleCreateAppt(data);
-            setShowApptModal(false);
-          }}
-        />
-      )}
-
       {(showApptModal || editingAppt) && (
         <AppointmentFormModal
           doctors={doctors}
@@ -204,19 +259,34 @@ export default function FrontdeskDashboard({ user }) {
             setEditingAppt(null);
           }}
           onSubmit={async (data) => {
-            await handleCreateAppt(data);
-            setShowApptModal(false);
-          }}
-          onUpdate={async (id, data) => {
-            await editAppointment(id, data);
-            loadAppts();
-            setEditingAppt(null);
-            alert("Appointment updated successfully!");
+            try {
+              if (editingAppt) {
+                await editAppointment(editingAppt.Appt_ID, data);
+                showModal("Appointment updated successfully!");
+              } else {
+                await createAppointment(data);
+                showModal("Appointment created successfully!");
+              }
+              loadAppts();
+              setShowApptModal(false);
+              setEditingAppt(null);
+            } catch (error) {
+              showModal(error.message || (editingAppt ? "Failed to update appointment" : "Failed to create appointment"));
+            }
           }}
           editData={editingAppt}
         />
       )}
       
+      <ConfirmationModal
+        isOpen={modalConfig.isOpen}
+        onClose={modalConfig.onCancel}
+        onConfirm={modalConfig.onConfirm}
+        title={modalConfig.message.includes("success") ? "Success" : "Confirm Action"}
+        message={modalConfig.message}
+        showCancel={modalConfig.showCancel}
+        confirmText={modalConfig.confirmText}
+      />
     </div>
   );
 }

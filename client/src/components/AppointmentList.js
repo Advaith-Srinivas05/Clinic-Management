@@ -1,11 +1,33 @@
 // AppointmentList.js
-import React from "react";
+import React, { useState } from "react";
 import styles from "../css/AppointmentList.module.css";
+import ConfirmationModal from "./ConfirmationModal";
 
 export default function AppointmentList({ appts, onEdit, onDelete }) {
+  const [showDeleteModal, setShowDeleteModal] = useState(false);
+  const [appointmentToDelete, setAppointmentToDelete] = useState(null);
+
   if (!appts || appts.length === 0) {
     return <div className={styles.empty}>No appointments found.</div>;
   }
+
+  const handleDeleteClick = (appointment) => {
+    setAppointmentToDelete(appointment);
+    setShowDeleteModal(true);
+  };
+
+  const confirmDelete = () => {
+    if (appointmentToDelete) {
+      onDelete(appointmentToDelete.Appt_ID);
+      setShowDeleteModal(false);
+      setAppointmentToDelete(null);
+    }
+  };
+
+  const cancelDelete = () => {
+    setShowDeleteModal(false);
+    setAppointmentToDelete(null);
+  };
 
   return (
     <div className={styles.tableWrapper}>
@@ -57,10 +79,7 @@ export default function AppointmentList({ appts, onEdit, onDelete }) {
                   </button>
                   <button
                     className={`${styles.actionBtn} ${styles.deleteBtn}`}
-                    onClick={() => {
-                      if (window.confirm("Delete this appointment?"))
-                        onDelete(a.Appt_ID);
-                    }}
+                    onClick={() => handleDeleteClick(a)}
                   >
                     Delete
                   </button>
@@ -70,6 +89,13 @@ export default function AppointmentList({ appts, onEdit, onDelete }) {
           </tbody>
         </table>
       </div>
+      <ConfirmationModal
+        isOpen={showDeleteModal}
+        onClose={cancelDelete}
+        onConfirm={confirmDelete}
+        title="Delete Appointment"
+        message={`Are you sure you want to delete appointment #${appointmentToDelete?.Appt_ID}? This action cannot be undone.`}
+      />
     </div>
   );
 }

@@ -52,4 +52,37 @@ router.put('/:id', async (req, res) => {
   } catch (err) { res.status(500).json({ error: 'Server error' }); }
 });
 
+// Delete patient
+// SQL: DELETE FROM Patient WHERE Patient_ID = ?
+router.delete('/:id', async (req, res) => {
+  const connection = await pool.getConnection();
+  try {
+    await connection.beginTransaction();
+    
+    // First, delete related records to maintain referential integrity
+    const deleteQueries = [
+      'DELETE FROM Payments WHERE Patient_ID = ?',
+      'DELETE FROM Prescription WHERE Patient_ID = ?',
+      'DELETE FROM Appointments WHERE Patient_ID = ?',
+      'DELETE FROM Patient WHERE Patient_ID = ?'
+    ];
+
+    for (const query of deleteQueries) {
+      await connection.query(query, [req.params.id]);
+    }
+    
+    await connection.commit();
+    res.json({ message: 'Patient and all related records deleted successfully' });
+  } catch (err) {
+    await connection.rollback();
+    console.error('Error deleting patient:', err);
+    res.status(500).json({ 
+      error: 'Failed to delete patient',
+      details: err.message 
+    });
+  } finally {
+    connection.release();
+  }
+});
+
 module.exports = router;
