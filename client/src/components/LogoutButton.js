@@ -1,6 +1,7 @@
 // LogoutButton.js
 import React from "react";
 import { useNavigate } from "react-router-dom";
+import styles from "../css/LogoutButton.module.css";
 
 export default function LogoutButton() {
   const navigate = useNavigate();
@@ -12,18 +13,10 @@ export default function LogoutButton() {
   };
 
   return (
-    <button
-      onClick={handleLogout}
-      style={{
-        background: "#e74c3c",
-        color: "white",
-        border: "none",
-        padding: "8px 14px",
-        borderRadius: "6px",
-        cursor: "pointer",
-      }}
-    >
-      Logout
+    <button onClick={handleLogout} className={styles.button}>
+      <span className={styles.span}>
+        Logout
+      </span>
     </button>
   );
 }

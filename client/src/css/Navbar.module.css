@@ -40,18 +40,9 @@
 }
 
 .right button {
-  background-color: #e74c3c;
-  color: #fff;
-  border: none;
-  border-radius: 6px;
-  padding: 8px 16px;
+  font-family: inherit;
   font-weight: 600;
   cursor: pointer;
-  transition: background 0.2s ease-in-out;
-}
-
-.right button:hover {
-  background-color: #c0392b;
 }
 
 .navButton {
