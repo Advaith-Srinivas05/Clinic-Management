@@ -1,25 +1,26 @@
 // LogoutButton.js
-import React from 'react';
+import React from "react";
+import { useNavigate } from "react-router-dom";
 
 export default function LogoutButton() {
+  const navigate = useNavigate();
+
   const handleLogout = () => {
-    localStorage.removeItem('token');
-    window.location.reload(); // simplest way to reset everything
+    localStorage.removeItem("token");
+    localStorage.removeItem("role");
+    navigate("/login");
   };
 
   return (
     <button
       onClick={handleLogout}
       style={{
-        position: 'absolute',
-        top: 15,
-        right: 15,
-        background: '#e74c3c',
-        color: 'white',
-        border: 'none',
-        padding: '8px 14px',
-        borderRadius: '6px',
-        cursor: 'pointer'
+        background: "#e74c3c",
+        color: "white",
+        border: "none",
+        padding: "8px 14px",
+        borderRadius: "6px",
+        cursor: "pointer",
       }}
     >
       Logout

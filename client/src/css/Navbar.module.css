@@ -8,8 +8,8 @@
   background-color: #ffffff;
   display: flex;
   align-items: center;
-  box-sizing: border-box;
   justify-content: space-between;
+  box-sizing: border-box;
   padding: 0 24px;
   border-bottom: 1px solid #ddd;
   box-shadow: 0 2px 5px rgba(0, 0, 0, 0.08);
@@ -27,6 +27,11 @@
   color: #111;
   letter-spacing: 0.5px;
   user-select: none;
+}
+
+.center {
+  display: flex;
+  gap: 30px;
 }
 
 .right {
@@ -47,4 +52,43 @@
 
 .right button:hover {
   background-color: #c0392b;
+}
+
+.navButton {
+  all: unset;
+  font-size: 16px;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.1em;
+  cursor: pointer;
+  position: relative;
+  padding: 8px 12px;
+  color: #111;
+  font-family: inherit;
+  text-decoration: none;
+}
+
+.centerButton::after {
+  content: "";
+  position: absolute;
+  bottom: 0;
+  left: 50%;
+  width: 0;
+  height: 2px;
+  background: #111;
+  transition: width 0.3s ease, left 0.3s ease;
+}
+
+.centerButton:hover::after {
+  width: 100%;
+  left: 0;
+}
+
+.active::after {
+  width: 100%;
+  left: 0;
+}
+
+.active {
+  color: #000;
 }

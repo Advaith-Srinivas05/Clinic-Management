@@ -1,6 +1,7 @@
 // AppointmentFormModal.js
 import React, { useState, useEffect } from "react";
 import styles from "../css/AppointmentFormModal.module.css";
+import appointmentImg from "../img/appointment.png";
 import { searchPatients } from "../api";
 
 export default function AppointmentFormModal({
@@ -86,7 +87,7 @@ export default function AppointmentFormModal({
           </h1>
           <div className={styles.imageBox}>
             <img
-              src="https://cdn-icons-png.flaticon.com/512/3075/3075977.png"
+              src={appointmentImg}
               alt="appointment"
             />
           </div>

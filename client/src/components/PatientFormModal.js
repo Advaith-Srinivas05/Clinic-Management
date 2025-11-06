@@ -1,5 +1,6 @@
 import React, { useState } from "react";
 import styles from "../css/PatientFormModal.module.css";
+import registerImg from "../img/register.png";
 
 export default function PatientFormModal({ onClose, onSubmit }) {
   const [form, setForm] = useState({
@@ -36,7 +37,7 @@ export default function PatientFormModal({ onClose, onSubmit }) {
           </h1>
           <div className={styles.imageBox}>
             <img
-              src="https://cdn-icons-png.flaticon.com/512/3209/3209265.png"
+              src={registerImg}
               alt="clinic-illustration"
             />
           </div>

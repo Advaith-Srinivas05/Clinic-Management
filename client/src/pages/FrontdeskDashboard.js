@@ -91,7 +91,7 @@ export default function FrontdeskDashboard({ user }) {
       <Navbar />
       <div className={styles.materialTable}>
         <div className={styles.tableHeader}>
-          <span className={styles.tableTitle}>Appointments</span>
+          <span className={styles.tableTitle}>APPOINTMENTS</span>
 
           <div className={styles.actions}>
             <button

@@ -1,51 +1,42 @@
-// App.js
-import React, { useState, useEffect } from 'react';
-import { jwtDecode } from 'jwt-decode';
-import Login from './pages/Login';
-import FrontdeskDashboard from './pages/FrontdeskDashboard';
-import DoctorDashboard from './pages/DoctorDashboard';
-import AdminDashboard from './pages/AdminDashboard';
+import React from "react";
+import { Routes, Route, Navigate } from "react-router-dom";
+import Login from "./pages/Login";
+import FrontdeskDashboard from "./pages/FrontdeskDashboard";
+import FrontdeskPatientSearch from "./pages/FrontdeskPatientSearch";
+
+// Placeholder components for now
+function DoctorDashboard() {
+  return <h2 style={{ padding: "2rem" }}>Doctor Dashboard (Coming soon)</h2>;
+}
+function AdminDashboard() {
+  return <h2 style={{ padding: "2rem" }}>Admin Dashboard (Coming soon)</h2>;
+}
+
+// Helper: redirects to proper home route by role
+function RoleRedirect() {
+  const role = localStorage.getItem("role");
+  if (role === "FrontDesk") return <Navigate to="/frontdesk/appointments" />;
+  if (role === "Doctor") return <Navigate to="/doctor/dashboard" />;
+  if (role === "Admin") return <Navigate to="/admin/dashboard" />;
+  return <Navigate to="/login" />;
+}
 
 export default function App() {
-  const [user, setUser] = useState(null);
-  const [loading, setLoading] = useState(true);
+  const token = localStorage.getItem("token");
 
-  // decode token once on load
-  useEffect(() => {
-    const token = localStorage.getItem('token');
-    if (token) {
-      try {
-        const decoded = jwtDecode(token);
-        // normalize role to capitalized form
-        const role = decoded.role ? decoded.role.toLowerCase() : '';
-        setUser({
-          role: role,
-          doctorId: decoded.doctorId,
-        });
-      } catch (err) {
-        console.error('Invalid token:', err);
-        localStorage.removeItem('token');
-      }
-    }
-    setLoading(false);
-  }, []);
+  return (
+    <Routes>
+      <Route path="/" element={token ? <RoleRedirect /> : <Navigate to="/login" />} />
+      <Route path="/login" element={<Login />} />
 
-  const handleLogin = (res) => {
-    const role = res.role ? res.role.toLowerCase() : '';
-    setUser({ role, doctorId: res.doctorId });
-  };
+      <Route path="/frontdesk/appointments" element={<FrontdeskDashboard />} />
+      <Route path="/frontdesk/patients" element={<FrontdeskPatientSearch />} />
 
-  if (loading) return <div style={{ padding: 20 }}>Loading...</div>;
+      <Route path="/doctor/dashboard" element={<DoctorDashboard />} />
 
-  // no user yet → login screen
-  if (!user) {
-    return <Login onLogin={handleLogin} />;
-  }
+      <Route path="/admin/dashboard" element={<AdminDashboard />} />
 
-  // normalize roles and route
-  if (user.role === 'frontdesk') return <FrontdeskDashboard user={user} />;
-  if (user.role === 'doctor') return <DoctorDashboard user={user} />;
-  if (user.role === 'admin') return <AdminDashboard user={user} />;
-
-  return <div style={{ padding: 20 }}>Unknown role: {user.role}</div>;
+      <Route path="*" element={<Navigate to="/" />} />
+    </Routes>
+  );
 }
