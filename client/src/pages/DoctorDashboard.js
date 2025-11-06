@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { getAppointments, createPrescription, medicines, payments } from '../api';
-import LogoutButton from '../components/LogoutButton';
+import DoctorNavbar from '../components/DoctorNavbar';
 
 
 export default function DoctorDashboard({ user }) {
@@ -30,8 +30,8 @@ export default function DoctorDashboard({ user }) {
 
   return (
     <div style={{padding:20}}>
+      <DoctorNavbar/>
       <h2>Doctor Dashboard (you are doctor ID: {doctorId})</h2>
-      <LogoutButton />
       <h3>Your Queue</h3>
       <ul>
         {appts.map(a => (

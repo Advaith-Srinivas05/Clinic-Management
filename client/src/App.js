@@ -18,6 +18,7 @@ function RoleRedirect() {
 
 export default function App() {
   const token = localStorage.getItem("token");
+  const user = JSON.parse(localStorage.getItem("user") || '{}');
 
   return (
     <Routes>
@@ -27,7 +28,7 @@ export default function App() {
       <Route path="/frontdesk/appointments" element={<FrontdeskDashboard />} />
       <Route path="/frontdesk/patients" element={<FrontdeskPatientSearch />} />
 
-      <Route path="/doctor/dashboard" element={<DoctorDashboard />} />
+      <Route path="/doctor/dashboard" element={<DoctorDashboard user={user} />} />
 
       <Route path="/admin/medicines" element={<AdminMedicines />} />
       <Route path="/admin/activity" element={<AdminActivity />} />
