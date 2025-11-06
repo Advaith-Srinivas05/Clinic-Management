@@ -41,7 +41,6 @@ CREATE TABLE Medicine (
     Supplier VARCHAR(100),
     Cost_to_buy DECIMAL(10,2),
     Cost_to_sell DECIMAL(10,2),
-    Expiry_Date DATE
 );
 
 -- Appointments
@@ -115,5 +114,7 @@ CREATE TABLE Login_Attempts (
     Attempt_ID INT PRIMARY KEY AUTO_INCREMENT,
     Username VARCHAR(50),
     Attempt_Time DATETIME DEFAULT CURRENT_TIMESTAMP,
-    Success BOOLEAN
+    User_ID INT DEFAULT NULL,
+    Success BOOLEAN,
+    FOREIGN KEY (User_ID) REFERENCES Login(User_ID) ON DELETE SET NULL
 );

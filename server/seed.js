@@ -18,9 +18,9 @@ async function seed() {
     const doc2 = doctors[1].Doctor_ID;
 
     // Insert medicines
-    const insertMedSQL = `INSERT INTO Medicine (Med_Name, Type_of_Medicine, Stock_Left, Brand, Supplier, Cost_to_buy, Cost_to_sell, Expiry_Date) VALUES (?, ?, ?, ?, ?, ?, ?, ?)`;
-    await conn.query(insertMedSQL, ['Paracetamol', 'Tablet', 100, 'Panadol', 'MedSupplier', 10.00, 15.00, '2026-12-31']);
-    await conn.query(insertMedSQL, ['Amoxicillin', 'Capsule', 50, 'Amox', 'MedSupplier', 20.00, 30.00, '2026-06-30']);
+    const insertMedSQL = `INSERT INTO Medicine (Med_Name, Type_of_Medicine, Stock_Left, Brand, Supplier, Cost_to_buy, Cost_to_sell) VALUES (?, ?, ?, ?, ?, ?, ?)`;
+    await conn.query(insertMedSQL, ['Paracetamol', 'Tablet', 100, 'Panadol', 'MedSupplier', 10.00, 15.00]);
+    await conn.query(insertMedSQL, ['Amoxicillin', 'Capsule', 50, 'Amox', 'MedSupplier', 20.00, 30.00]);
 
     // helper to insert user
     const insertUser = async (username, password, role, doctor_id=null) => {

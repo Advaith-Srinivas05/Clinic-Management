@@ -9,11 +9,17 @@ async function req(path, opts = {}) {
   const res = await fetch(`${API_BASE}${path}`, opts);
   if (!res.ok) {
     let msg = 'Unknown error';
+    let bodyText = '';
     try {
-      const err = await res.json();
-      msg = err.error || JSON.stringify(err);
-    } catch {
-      msg = await res.text();
+      bodyText = await res.text();
+      try {
+        const errObj = JSON.parse(bodyText);
+        msg = errObj.error || errObj.message || bodyText;
+      } catch {
+        msg = bodyText || res.statusText;
+      }
+    } catch (e) {
+      msg = res.statusText || msg;
     }
     throw new Error(msg);
   }
@@ -41,12 +47,17 @@ export const payments = {
 
 export const medicines = {
   list: () => req('/medicines'),
-  update: (id, data) => req(`/medicines/${id}`, { method: 'PUT', body: JSON.stringify(data) })
+  search: (q) => req(`/medicines/search?q=${encodeURIComponent(q)}`),
+  create: (data) => req('/medicines', { method: 'POST', body: JSON.stringify(data) }),
+  update: (id, data) => req(`/medicines/${id}`, { method: 'PUT', body: JSON.stringify(data) }),
+  remove: (id) => req(`/medicines/${id}`, { method: 'DELETE' })
 };
 
 export const admin = {
   createDoctor: (d) => req('/admin/create-doctor', { method: 'POST', body: JSON.stringify(d) }),
-  logins: () => req('/admin/logins')
+  logins: () => req('/admin/logins'),
+  attempts: () => req('/admin/attempts'),
+  attemptsSearch: (q) => req(`/admin/attempts/search?q=${encodeURIComponent(q)}`)
 };
 
 export const searchAppointments = (q) =>

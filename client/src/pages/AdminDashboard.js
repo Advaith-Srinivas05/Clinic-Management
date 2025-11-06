@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from 'react';
 import { medicines, admin } from '../api';
-import LogoutButton from '../components/LogoutButton';
+import AdminNavbar from "../components/AdminNavbar";
 
 
 export default function AdminDashboard() {
@@ -8,7 +8,9 @@ export default function AdminDashboard() {
   const [logins, setLogins] = useState([]);
   const [newDoc, setNewDoc] = useState({ username:'', password:'', doctorName:'' });
 
-  useEffect(()=> load(), []);
+  useEffect(() => {
+    load();
+  }, []);
   async function load() {
     setMeds(await medicines.list());
     setLogins(await admin.logins());
@@ -21,9 +23,8 @@ export default function AdminDashboard() {
   };
 
   return (
-    <div style={{padding:20}}>
-      <h2>Admin Dashboard</h2>
-      <LogoutButton />
+    <div style={{ padding: 20, paddingTop: 84 }}>
+      <AdminNavbar />
       <h3>Create Doctor Login</h3>
       <input placeholder="username" value={newDoc.username} onChange={e=>setNewDoc({...newDoc, username: e.target.value})} />
       <input placeholder="password" value={newDoc.password} onChange={e=>setNewDoc({...newDoc, password: e.target.value})} />
