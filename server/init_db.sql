@@ -6,7 +6,7 @@ USE clinicdb;
 CREATE TABLE Doctor (
     Doctor_ID INT PRIMARY KEY AUTO_INCREMENT,
     Name VARCHAR(100) NOT NULL,
-    Age INT,
+    DOB DATE,
     Gender ENUM('Male','Female','Other'),
     Phone_Number VARCHAR(15) UNIQUE,
     Email_Id VARCHAR(100) UNIQUE,

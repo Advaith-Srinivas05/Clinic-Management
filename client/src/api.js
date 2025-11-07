@@ -67,6 +67,7 @@ export const admin = {
   usersCreate: (data) => req('/admin/users', { method: 'POST', body: JSON.stringify(data) }),
   usersSearch: (q) => req(`/admin/logins/search?q=${encodeURIComponent(q)}`),
   usersDelete: (id) => req(`/admin/users/${id}`, { method: 'DELETE' }),
+  usersUpdate: (id, data) => req(`/admin/users/${id}`, { method: 'PUT', body: JSON.stringify(data) }),
   doctors: () => req('/admin/doctors'),
   doctorsSearch: (q) => req(`/admin/doctors/search?q=${encodeURIComponent(q)}`)
 };
