@@ -25,6 +25,7 @@ app.use('/payments', paymentRoutes);
 app.use('/medicines', medRoutes);
 app.use('/admin', adminRoutes);
 app.use("/api/doctors", doctorRoutes);
+app.use("/doctors", doctorRoutes);
 
 const PORT = process.env.PORT || 4000;
 app.listen(PORT, () => console.log(`Server running on port ${PORT}`));

@@ -45,6 +45,11 @@ export const payments = {
   list: (doctorId) => req(`/payments?doctorId=${doctorId || ''}`)
 };
 
+export const doctors = {
+  stats: (doctorId) => req(`/api/doctors/${doctorId}/stats`),
+  list: () => req('/api/doctors')
+};
+
 export const medicines = {
   list: () => req('/medicines'),
   search: (q) => req(`/medicines/search?q=${encodeURIComponent(q)}`),

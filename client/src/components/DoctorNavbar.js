@@ -1,7 +1,7 @@
 import React from "react";
 import { NavLink } from "react-router-dom";
 import styles from "../css/Navbar.module.css";
-import LogoutButton from "./LogoutButton";
+import DoctorLogoutButton from "./DoctorLogoutButton";
 
 export default function DoctorNavbar() {
   return (
@@ -41,7 +41,7 @@ export default function DoctorNavbar() {
       </div>
 
       <div className={styles.right}>
-        <LogoutButton />
+        <DoctorLogoutButton/>
       </div>
     </nav>
   );

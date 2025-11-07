@@ -8,6 +8,7 @@ import DoctorPatientSearch from "./pages/DoctorPatientSearch";
 import AdminMedicines from "./pages/AdminMedicines";
 import AdminUsers from "./pages/AdminUsers";
 import AdminActivity from "./pages/AdminActivity";
+import DoctorStats from "./pages/DoctorStats";
 
 function RoleRedirect() {
   const role = localStorage.getItem("role");
@@ -31,7 +32,7 @@ export default function App() {
 
       <Route path="/doctor/dashboard" element={<DoctorDashboard user={user} />} />
       <Route path="/doctor/patients" element={<DoctorPatientSearch user={user} />} />
-      <Route path="/doctor/stats" element={<DoctorDashboard user={user} />} />
+      <Route path="/doctor/stats" element={<DoctorStats user={user} />} />
 
       <Route path="/admin/medicines" element={<AdminMedicines />} />
       <Route path="/admin/activity" element={<AdminActivity />} />
