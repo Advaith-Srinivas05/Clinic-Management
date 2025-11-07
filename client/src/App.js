@@ -29,6 +29,8 @@ export default function App() {
       <Route path="/frontdesk/patients" element={<FrontdeskPatientSearch />} />
 
       <Route path="/doctor/dashboard" element={<DoctorDashboard user={user} />} />
+      <Route path="/doctor/patients" element={<DoctorDashboard user={user} />} />
+      <Route path="/doctor/stats" element={<DoctorDashboard user={user} />} />
 
       <Route path="/admin/medicines" element={<AdminMedicines />} />
       <Route path="/admin/activity" element={<AdminActivity />} />
