@@ -1,7 +1,7 @@
 import React from "react";
 import styles from "../css/AppointmentList.module.css";
 
-export default function DoctorAppointmentList({ appts, onPrescribe }) {
+export default function DoctorAppointmentList({ appts, onStart }) {
   if (!appts || appts.length === 0) {
     return <div className={styles.empty}>No appointments found.</div>;
   }
@@ -45,10 +45,10 @@ export default function DoctorAppointmentList({ appts, onPrescribe }) {
                 <td>
                   <button
                     className={`${styles.actionBtn} ${styles.primaryBtn}`}
-                    onClick={() => onPrescribe(a)}
+                    onClick={() => onStart(a)}
                     disabled={a.Status === 'Completed'}
                   >
-                    {a.Status === 'Completed' ? 'Completed' : 'Prescribe'}
+                    {a.Status === 'Completed' ? 'Completed' : 'Start Appointment'}
                   </button>
                 </td>
               </tr>
