@@ -22,7 +22,7 @@ export default function DoctorNavbar() {
         </NavLink>
 
         <NavLink
-          to="/doctor/dashboard/patients"
+          to="/doctor/patients"
           className={({ isActive }) =>
             `${styles.navButton} ${styles.centerButton} ${isActive ? styles.active : ""}`
           }
@@ -31,7 +31,7 @@ export default function DoctorNavbar() {
         </NavLink>
 
         <NavLink
-          to="/doctor/dashboard/stats"
+          to="/doctor/stats"
           className={({ isActive }) =>
             `${styles.navButton} ${styles.centerButton} ${isActive ? styles.active : ""}`
           }

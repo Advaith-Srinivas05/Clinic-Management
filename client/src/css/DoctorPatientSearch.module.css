@@ -1,0 +1,113 @@
+.page {
+  padding: 20px;
+  padding-top: 84px;
+  position: relative;
+  background: #f5f7fa;
+  min-height: 100vh;
+  box-sizing: border-box;
+}
+
+.materialTable {
+  background: #fff;
+  border-radius: 10px;
+  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.1);
+  overflow: hidden;
+}
+
+.tableHeader {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  height: 64px;
+  border-bottom: 1px solid #ddd;
+  padding: 0 20px;
+}
+
+.tableTitle {
+  font-size: 20px;
+  color: #000;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  cursor: pointer;
+  position: relative;
+  padding: 8px 12px;
+  color: #111;
+  font-family: inherit;
+  text-decoration: none;
+}
+
+.actions {
+  display: flex;
+  gap: 8px;
+}
+
+.iconButton {
+  background: none;
+  border: none;
+  cursor: pointer;
+  padding: 6px;
+  border-radius: 6px;
+  transition: background 0.2s;
+}
+
+.iconButton:hover {
+  background: rgba(0, 0, 0, 0.05);
+}
+
+.searchBar {
+  position: relative;
+  padding: 12px 20px;
+  border-bottom: 1px solid #ddd;
+}
+
+.searchBar input {
+  width: 100%;
+  padding: 10px;
+  border-radius: 6px;
+  border: 1px solid #ccc;
+  font-size: 14px;
+  box-sizing: border-box;
+}
+
+.loading {
+  font-size: 12px;
+  margin-top: 5px;
+  color: #777;
+}
+
+.searchDropdown {
+  position: absolute;
+  top: 56px;
+  left: 20px;
+  width: calc(100% - 40px);
+  background: #fff;
+  border: 1px solid #ccc;
+  border-radius: 6px;
+  max-height: 200px;
+  overflow-y: auto;
+  z-index: 10;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+}
+
+.searchItem {
+  padding: 8px 12px;
+  cursor: pointer;
+  transition: background 0.2s;
+}
+
+.searchItem:hover {
+  background: #f1f1f1;
+}
+
+.tableContent {
+  padding: 10px 20px;
+}
+
+.formCard {
+  background: #f8f9fa;
+  padding: 20px;
+  border-radius: 10px;
+  margin-top: 20px;
+  box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+}

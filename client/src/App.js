@@ -4,6 +4,7 @@ import Login from "./pages/Login";
 import FrontdeskDashboard from "./pages/FrontdeskDashboard";
 import FrontdeskPatientSearch from "./pages/FrontdeskPatientSearch";
 import DoctorDashboard from "./pages/DoctorDashboard"
+import DoctorPatientSearch from "./pages/DoctorPatientSearch";
 import AdminMedicines from "./pages/AdminMedicines";
 import AdminUsers from "./pages/AdminUsers";
 import AdminActivity from "./pages/AdminActivity";
@@ -29,7 +30,7 @@ export default function App() {
       <Route path="/frontdesk/patients" element={<FrontdeskPatientSearch />} />
 
       <Route path="/doctor/dashboard" element={<DoctorDashboard user={user} />} />
-      <Route path="/doctor/patients" element={<DoctorDashboard user={user} />} />
+      <Route path="/doctor/patients" element={<DoctorPatientSearch user={user} />} />
       <Route path="/doctor/stats" element={<DoctorDashboard user={user} />} />
 
       <Route path="/admin/medicines" element={<AdminMedicines />} />
