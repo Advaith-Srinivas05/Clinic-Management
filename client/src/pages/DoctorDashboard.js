@@ -7,9 +7,9 @@ import styles from '../css/FrontdeskDashboard.module.css';
 
 export default function DoctorDashboard({ user }) {
   const storedDoctorId = typeof window !== 'undefined' ? localStorage.getItem('doctorId') : null;
-  const doctorId = (user && user.doctorId != null)
-    ? user.doctorId
-    : (storedDoctorId != null ? Number(storedDoctorId) : undefined);
+  const doctorId = (storedDoctorId != null)
+    ? Number(storedDoctorId)
+    : (user && user.doctorId != null ? user.doctorId : undefined);
   const [appts, setAppts] = useState([]);
   const [meds, setMeds] = useState([]);
   const [loading, setLoading] = useState(true);

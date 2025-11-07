@@ -6,9 +6,9 @@ import tableStyles from '../css/AppointmentList.module.css';
 
 export default function DoctorStats({ user }) {
   const storedDoctorId = typeof window !== 'undefined' ? localStorage.getItem('doctorId') : null;
-  const doctorId = (user && user.doctorId != null)
-    ? user.doctorId
-    : (storedDoctorId != null ? Number(storedDoctorId) : undefined);
+  const doctorId = (storedDoctorId != null)
+    ? Number(storedDoctorId)
+    : (user && user.doctorId != null ? user.doctorId : undefined);
 
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState('');

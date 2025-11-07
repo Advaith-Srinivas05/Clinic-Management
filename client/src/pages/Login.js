@@ -15,6 +15,8 @@ export default function Login() {
       const res = await login(username, password);
       localStorage.setItem("token", res.token);
       localStorage.setItem("role", res.role);
+      // Clear any stale doctorId from previous sessions before setting a new one
+      localStorage.removeItem("doctorId");
       if (res.doctorId != null) {
         localStorage.setItem("doctorId", String(res.doctorId));
       }

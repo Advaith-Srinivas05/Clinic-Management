@@ -25,6 +25,8 @@ export default function DoctorLogoutButton() {
   const handleLogout = () => {
     localStorage.removeItem("token");
     localStorage.removeItem("role");
+    localStorage.removeItem("doctorId");
+    localStorage.removeItem("user");
     navigate("/login");
   };
 
