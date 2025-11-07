@@ -2,17 +2,32 @@ import React, { useState } from "react";
 import styles from "../css/AppointmentFormModal.module.css";
 import pfStyles from "../css/PatientFormModal.module.css";
 
-export default function UserFormModal({ onClose, onSubmit, submitting = false }) {
+export default function UserFormModal({ onClose, onSubmit, submitting = false, editData = null }) {
   const [form, setForm] = useState({
     username: "",
     password: "",
     doctorName: "",
-    age: "",
+    dob: "",
     phone: "",
     email: "",
     qualifications: "",
     gender: "",
   });
+
+  React.useEffect(() => {
+    if (editData) {
+      setForm({
+        username: editData.Username || "",
+        password: "",
+        doctorName: editData.DoctorName || "",
+        dob: editData.DoctorDOB ? String(editData.DoctorDOB).slice(0, 10) : "",
+        phone: editData.DoctorPhone || "",
+        email: editData.DoctorEmail || "",
+        qualifications: editData.DoctorQualifications || "",
+        gender: editData.DoctorGender || "",
+      });
+    }
+  }, [editData]);
 
   function handleChange(e) {
     const { name, value } = e.target;
@@ -25,7 +40,7 @@ export default function UserFormModal({ onClose, onSubmit, submitting = false })
       username: form.username.trim(),
       password: form.password,
       doctorName: form.doctorName.trim(),
-      age: form.age ? parseInt(form.age, 10) : undefined,
+      dob: form.dob || undefined,
       phone: form.phone.trim(),
       email: form.email.trim(),
       qualifications: form.qualifications.trim(),
@@ -40,7 +55,7 @@ export default function UserFormModal({ onClose, onSubmit, submitting = false })
         {/* Single Column (no left panel) */}
         <div className={styles.rightContainer} style={{ width: 700 }}>
           <header>
-            <h1>Add Doctor</h1>
+            <h1>{editData ? 'Edit Doctor' : 'Add Doctor'}</h1>
           </header>
 
           <form onSubmit={handleSubmit}>
@@ -61,7 +76,7 @@ export default function UserFormModal({ onClose, onSubmit, submitting = false })
                   name="password"
                   value={form.password}
                   onChange={handleChange}
-                  required
+                  required={!editData}
                 />
               </div>
             </div>
@@ -124,14 +139,12 @@ export default function UserFormModal({ onClose, onSubmit, submitting = false })
                 </div>
               </div>
               <div>
-                <label>Age</label>
+                <label>Date of Birth</label>
                 <input
-                  type="number"
-                  name="age"
-                  value={form.age}
+                  type="date"
+                  name="dob"
+                  value={form.dob}
                   onChange={handleChange}
-                  placeholder="Age"
-                  min="0"
                 />
               </div>
             </div>
@@ -167,7 +180,7 @@ export default function UserFormModal({ onClose, onSubmit, submitting = false })
                 Cancel
               </button>
               <button type="submit" className={styles.submit} disabled={submitting}>
-                {submitting ? 'Adding...' : 'Add Doctor'}
+                {submitting ? (editData ? 'Saving...' : 'Adding...') : (editData ? 'Save Changes' : 'Add Doctor')}
               </button>
             </footer>
           </form>

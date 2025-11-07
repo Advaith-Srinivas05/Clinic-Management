@@ -7,10 +7,10 @@ async function seed() {
   try {
     await conn.beginTransaction();
 
-    // Insert two doctors
-    const insertDoctorSQL = `INSERT INTO Doctor (Name, Age, Gender, Phone_Number, Email_Id, Qualifications) VALUES (?, ?, ?, ?, ?, ?)`;
-    await conn.query(insertDoctorSQL, ['Dr. Alice', 45, 'Female', '9990001111', 'alice@example.com', 'MBBS']);
-    await conn.query(insertDoctorSQL, ['Dr. Bob', 50, 'Male', '9990002222', 'bob@example.com', 'MD']);
+    // Insert two doctors (use DOB instead of Age)
+    const insertDoctorSQL = `INSERT INTO Doctor (Name, DOB, Gender, Phone_Number, Email_Id, Qualifications) VALUES (?, ?, ?, ?, ?, ?)`;
+    await conn.query(insertDoctorSQL, ['Dr. Alice', '1980-05-15', 'Female', '9990001111', 'alice@example.com', 'MBBS']);
+    await conn.query(insertDoctorSQL, ['Dr. Bob', '1975-09-22', 'Male', '9990002222', 'bob@example.com', 'MD']);
 
     // Get doctor ids
     const [doctors] = await conn.query('SELECT Doctor_ID, Name FROM Doctor');

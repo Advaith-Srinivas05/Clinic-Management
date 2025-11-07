@@ -64,6 +64,27 @@ export default function DoctorPatientSearch({ user }) {
     });
   }, []);
 
+  // Update existing patient (for editing from doctor view)
+  async function handleUpdatePatient(id, data) {
+    try {
+      const response = await fetch(`http://localhost:4000/patients/${id}`, {
+        method: "PUT",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(data),
+      });
+      if (!response.ok) {
+        const errorData = await response.text();
+        throw new Error(errorData || "Failed to update patient");
+      }
+      showModal("Patient updated successfully!");
+      setEditingPatient(null);
+      await loadPatientsForDoctor();
+    } catch (err) {
+      console.error("Error updating patient:", err);
+      showModal(err.message || "Failed to update patient");
+    }
+  }
+
   async function openHistory(patient) {
     try {
       setLoading(true);

@@ -7,20 +7,21 @@ const bcrypt = require('bcrypt');
 // SQL: INSERT INTO Login (Username, Password_Hash, Role, Doctor_ID) VALUES (?, ?, 'Doctor', ?)
 // Also create doctor row if details provided
 router.post('/create-doctor', async (req, res) => {
-  const { username, password, doctorName, phone, email, qualifications, gender, age } = req.body;
+  const { username, password, doctorName, phone, email, qualifications, gender, dob } = req.body;
   const conn = await pool.getConnection();
   try {
     await conn.beginTransaction();
     let g = null;
     if (gender && ['Male','Female','Other'].includes(gender)) g = gender;
-    let ageNum = null;
-    if (age !== undefined && age !== null && !Number.isNaN(Number(age))) {
-      const a = parseInt(age, 10);
-      if (Number.isInteger(a) && a >= 0) ageNum = a;
+    // Basic DOB validation: expect 'YYYY-MM-DD'
+    let dobVal = null;
+    if (dob) {
+      const m = /^\d{4}-\d{2}-\d{2}$/.test(dob);
+      if (m) dobVal = dob;
     }
     const [r] = await conn.query(
-      `INSERT INTO Doctor (Name, Age, Phone_Number, Email_Id, Qualifications, Gender) VALUES (?, ?, ?, ?, ?, ?)`,
-      [doctorName, ageNum, phone, email, qualifications, g]
+      `INSERT INTO Doctor (Name, DOB, Phone_Number, Email_Id, Qualifications, Gender) VALUES (?, ?, ?, ?, ?, ?)`,
+      [doctorName, dobVal, phone, email, qualifications, g]
     );
     const doctorId = r.insertId;
     const hash = await bcrypt.hash(password, 10);
@@ -98,7 +99,8 @@ router.get('/logins', async (req, res) => {
     const sql = `
       SELECT 
         l.User_ID, l.Username, l.Role, l.Doctor_ID, l.Created_On, l.Last_Active,
-        d.Name as DoctorName, d.Phone_Number as DoctorPhone, d.Email_Id as DoctorEmail, d.Qualifications as DoctorQualifications
+        d.Name as DoctorName, d.Phone_Number as DoctorPhone, d.Email_Id as DoctorEmail, d.Qualifications as DoctorQualifications,
+        d.Gender as DoctorGender, d.DOB as DoctorDOB
       FROM Login l 
       LEFT JOIN Doctor d ON l.Doctor_ID = d.Doctor_ID 
       ORDER BY l.Role, l.Username
@@ -127,7 +129,8 @@ router.get('/logins/search', async (req, res) => {
     const sql = `
       SELECT 
         l.User_ID, l.Username, l.Role, l.Doctor_ID, l.Created_On, l.Last_Active,
-        d.Name as DoctorName, d.Phone_Number as DoctorPhone, d.Email_Id as DoctorEmail, d.Qualifications as DoctorQualifications
+        d.Name as DoctorName, d.Phone_Number as DoctorPhone, d.Email_Id as DoctorEmail, d.Qualifications as DoctorQualifications,
+        d.Gender as DoctorGender, d.DOB as DoctorDOB
       FROM Login l LEFT JOIN Doctor d ON l.Doctor_ID = d.Doctor_ID
       WHERE ${where.join(' OR ')}
       ORDER BY l.Role, l.Username
@@ -135,6 +138,54 @@ router.get('/logins/search', async (req, res) => {
     const [rows] = await pool.query(sql, params);
     res.json(rows);
   } catch (err) { res.status(500).json({ error: 'Server error' }); }
+});
+
+// Admin: update a doctor user's login (username/password) and doctor details
+router.put('/users/:id', async (req, res) => {
+  const id = parseInt(req.params.id, 10);
+  if (!Number.isInteger(id)) return res.status(400).json({ error: 'Invalid user id' });
+  const { username, password, doctorName, phone, email, qualifications, gender, dob } = req.body || {};
+  const conn = await pool.getConnection();
+  try {
+    const [[row]] = await conn.query(`SELECT Role, Doctor_ID FROM Login WHERE User_ID = ?`, [id]);
+    if (!row) { conn.release(); return res.status(404).json({ error: 'User not found' }); }
+    if (row.Role !== 'Doctor') { conn.release(); return res.status(403).json({ error: 'Only Doctor accounts can be edited' }); }
+
+    await conn.beginTransaction();
+    const updates = [];
+    const params = [];
+    if (username) { updates.push('Username = ?'); params.push(username); }
+    if (updates.length) {
+      params.push(id);
+      await conn.query(`UPDATE Login SET ${updates.join(', ')} WHERE User_ID = ?`, params);
+    }
+    if (password && password.length > 0) {
+      const hash = await bcrypt.hash(password, 10);
+      await conn.query(`UPDATE Login SET Password_Hash = ? WHERE User_ID = ?`, [hash, id]);
+    }
+    if (row.Doctor_ID) {
+      const dUpdates = [];
+      const dParams = [];
+      if (doctorName != null) { dUpdates.push('Name = ?'); dParams.push(doctorName); }
+      if (phone != null) { dUpdates.push('Phone_Number = ?'); dParams.push(phone); }
+      if (email != null) { dUpdates.push('Email_Id = ?'); dParams.push(email); }
+      if (qualifications != null) { dUpdates.push('Qualifications = ?'); dParams.push(qualifications); }
+      if (gender && ['Male','Female','Other'].includes(gender)) { dUpdates.push('Gender = ?'); dParams.push(gender); }
+      if (dob && /^\d{4}-\d{2}-\d{2}$/.test(dob)) { dUpdates.push('DOB = ?'); dParams.push(dob); }
+      if (dUpdates.length) {
+        dParams.push(row.Doctor_ID);
+        await conn.query(`UPDATE Doctor SET ${dUpdates.join(', ')} WHERE Doctor_ID = ?`, dParams);
+      }
+    }
+    await conn.commit();
+    res.json({ ok: true });
+  } catch (err) {
+    try { await conn.rollback(); } catch {}
+    console.error(err);
+    res.status(500).json({ error: 'Server error' });
+  } finally {
+    conn.release();
+  }
 });
 
 // Admin: create a generic user (Admin/FrontDesk/Doctor with optional Doctor_ID)

@@ -10,6 +10,8 @@ export default function AdminUsers() {
   const [loading, setLoading] = useState(false);
   const [showAdd, setShowAdd] = useState(false);
   const [adding, setAdding] = useState(false);
+  const [editing, setEditing] = useState(false);
+  const [editRow, setEditRow] = useState(null);
   const [showSearch, setShowSearch] = useState(false);
   const [q, setQ] = useState("");
   const [searching, setSearching] = useState(false);
@@ -70,6 +72,19 @@ export default function AdminUsers() {
     }
   }
 
+  async function handleEditUser(userId, payload) {
+    setEditing(true);
+    try {
+      await admin.usersUpdate(userId, payload);
+      setEditRow(null);
+      await load(q.trim() ? q : "");
+    } catch (err) {
+      alert(err.message || "Failed to update doctor");
+    } finally {
+      setEditing(false);
+    }
+  }
+
   return (
     <div className={pageStyles.page}>
       <AdminNavbar />
@@ -91,11 +106,15 @@ export default function AdminUsers() {
           </div>
         </div>
 
-        {showAdd && (
+        {(showAdd || editRow) && (
           <UserFormModal
-            onClose={() => setShowAdd(false)}
-            onSubmit={handleAddUser}
-            submitting={adding}
+            onClose={() => { setShowAdd(false); setEditRow(null); }}
+            onSubmit={(data) => {
+              if (editRow) handleEditUser(editRow.User_ID, data);
+              else handleAddUser(data);
+            }}
+            submitting={editRow ? editing : adding}
+            editData={editRow || null}
           />
         )}
 
@@ -146,13 +165,22 @@ export default function AdminUsers() {
                         <td>{u.Last_Active ? new Date(u.Last_Active).toLocaleString() : ""}</td>
                         <td>
                           {u.Role === 'Doctor' ? (
-                            <button
-                              className={`${tableStyles.actionBtn} ${tableStyles.deleteBtn}`}
-                              style={{ padding: '4px 8px', fontSize: 12 }}
-                              onClick={() => handleDelete(u.User_ID, u.Role)}
-                            >
-                              Delete
-                            </button>
+                            <div style={{ display: 'flex', gap: 8 }}>
+                              <button
+                                className={tableStyles.actionBtn}
+                                style={{ padding: '4px 8px', fontSize: 12 }}
+                                onClick={() => setEditRow(u)}
+                              >
+                                Edit
+                              </button>
+                              <button
+                                className={`${tableStyles.actionBtn} ${tableStyles.deleteBtn}`}
+                                style={{ padding: '4px 8px', fontSize: 12 }}
+                                onClick={() => handleDelete(u.User_ID, u.Role)}
+                              >
+                                Delete
+                              </button>
+                            </div>
                           ) : (
                             <span style={{ color: '#888', fontSize: 12 }}>-</span>
                           )}
