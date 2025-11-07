@@ -1,14 +1,17 @@
 import React, { useState } from "react";
 import styles from "../css/AppointmentFormModal.module.css";
+import pfStyles from "../css/PatientFormModal.module.css";
 
 export default function UserFormModal({ onClose, onSubmit, submitting = false }) {
   const [form, setForm] = useState({
     username: "",
     password: "",
     doctorName: "",
+    age: "",
     phone: "",
     email: "",
     qualifications: "",
+    gender: "",
   });
 
   function handleChange(e) {
@@ -22,9 +25,11 @@ export default function UserFormModal({ onClose, onSubmit, submitting = false })
       username: form.username.trim(),
       password: form.password,
       doctorName: form.doctorName.trim(),
+      age: form.age ? parseInt(form.age, 10) : undefined,
       phone: form.phone.trim(),
       email: form.email.trim(),
       qualifications: form.qualifications.trim(),
+      gender: form.gender || undefined,
     };
     onSubmit(payload);
   }
@@ -79,6 +84,54 @@ export default function UserFormModal({ onClose, onSubmit, submitting = false })
                   value={form.phone}
                   onChange={handleChange}
                   placeholder="Phone"
+                />
+              </div>
+            </div>
+
+            <div className={styles.set} style={{ gap: 16 }}>
+              <div>
+                <label>Gender</label>
+                <div className={pfStyles.radioContainer} style={{ marginTop: 6 }}>
+                  <input
+                    type="radio"
+                    id="genderMale"
+                    name="gender"
+                    value="Male"
+                    checked={form.gender === 'Male'}
+                    onChange={handleChange}
+                  />
+                  <label htmlFor="genderMale">Male</label>
+
+                  <input
+                    type="radio"
+                    id="genderFemale"
+                    name="gender"
+                    value="Female"
+                    checked={form.gender === 'Female'}
+                    onChange={handleChange}
+                  />
+                  <label htmlFor="genderFemale">Female</label>
+
+                  <input
+                    type="radio"
+                    id="genderOther"
+                    name="gender"
+                    value="Other"
+                    checked={form.gender === 'Other'}
+                    onChange={handleChange}
+                  />
+                  <label htmlFor="genderOther">Other</label>
+                </div>
+              </div>
+              <div>
+                <label>Age</label>
+                <input
+                  type="number"
+                  name="age"
+                  value={form.age}
+                  onChange={handleChange}
+                  placeholder="Age"
+                  min="0"
                 />
               </div>
             </div>

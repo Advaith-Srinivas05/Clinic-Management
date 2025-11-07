@@ -7,11 +7,21 @@ const bcrypt = require('bcrypt');
 // SQL: INSERT INTO Login (Username, Password_Hash, Role, Doctor_ID) VALUES (?, ?, 'Doctor', ?)
 // Also create doctor row if details provided
 router.post('/create-doctor', async (req, res) => {
-  const { username, password, doctorName, phone, email, qualifications } = req.body;
+  const { username, password, doctorName, phone, email, qualifications, gender, age } = req.body;
   const conn = await pool.getConnection();
   try {
     await conn.beginTransaction();
-    const [r] = await conn.query(`INSERT INTO Doctor (Name, Phone_Number, Email_Id, Qualifications) VALUES (?, ?, ?, ?)`, [doctorName, phone, email, qualifications]);
+    let g = null;
+    if (gender && ['Male','Female','Other'].includes(gender)) g = gender;
+    let ageNum = null;
+    if (age !== undefined && age !== null && !Number.isNaN(Number(age))) {
+      const a = parseInt(age, 10);
+      if (Number.isInteger(a) && a >= 0) ageNum = a;
+    }
+    const [r] = await conn.query(
+      `INSERT INTO Doctor (Name, Age, Phone_Number, Email_Id, Qualifications, Gender) VALUES (?, ?, ?, ?, ?, ?)`,
+      [doctorName, ageNum, phone, email, qualifications, g]
+    );
     const doctorId = r.insertId;
     const hash = await bcrypt.hash(password, 10);
     await conn.query(`INSERT INTO Login (Username, Password_Hash, Role, Doctor_ID) VALUES (?, ?, 'Doctor', ?)`, [username, hash, doctorId]);
@@ -19,6 +29,35 @@ router.post('/create-doctor', async (req, res) => {
     res.json({ ok: true, doctorId });
   } catch (err) {
     await conn.rollback();
+    console.error(err);
+    res.status(500).json({ error: 'Server error' });
+  } finally {
+    conn.release();
+  }
+});
+
+// Admin: delete a user login (only allowed for Doctor role)
+router.delete('/users/:id', async (req, res) => {
+  const id = parseInt(req.params.id, 10);
+  if (!Number.isInteger(id)) return res.status(400).json({ error: 'Invalid user id' });
+  const conn = await pool.getConnection();
+  try {
+    const [[row]] = await conn.query(`SELECT Role, Doctor_ID FROM Login WHERE User_ID = ?`, [id]);
+    if (!row) { conn.release(); return res.status(404).json({ error: 'User not found' }); }
+    if (row.Role !== 'Doctor') { conn.release(); return res.status(403).json({ error: 'Only Doctor accounts can be deleted' }); }
+
+    await conn.beginTransaction();
+    // Delete the linked doctor record; FK from Login(Doctor_ID) should be ON DELETE CASCADE
+    if (row.Doctor_ID) {
+      await conn.query(`DELETE FROM Doctor WHERE Doctor_ID = ?`, [row.Doctor_ID]);
+    } else {
+      // Fallback: if somehow no doctor_id, delete login to avoid orphan
+      await conn.query(`DELETE FROM Login WHERE User_ID = ?`, [id]);
+    }
+    await conn.commit();
+    res.json({ ok: true });
+  } catch (err) {
+    try { await conn.rollback(); } catch {}
     console.error(err);
     res.status(500).json({ error: 'Server error' });
   } finally {

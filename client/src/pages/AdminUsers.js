@@ -26,6 +26,18 @@ export default function AdminUsers() {
     }
   }
 
+  async function handleDelete(userId, role) {
+    if (role !== 'Doctor') return;
+    if (!window.confirm('Delete this doctor login?')) return;
+    try {
+      await admin.usersDelete(userId);
+      await load(q.trim() ? q : "");
+    } catch (err) {
+      alert(err.message || 'Failed to delete user');
+    }
+  }
+ 
+
   // Debounced search
   useEffect(() => {
     const delay = setTimeout(async () => {
@@ -117,6 +129,7 @@ export default function AdminUsers() {
                       <th>Qualifications</th>
                       <th>Created On</th>
                       <th>Last Active</th>
+                      <th>Actions</th>
                     </tr>
                   </thead>
                   <tbody>
@@ -131,6 +144,19 @@ export default function AdminUsers() {
                         <td>{u.DoctorQualifications || '-'}</td>
                         <td>{u.Created_On ? new Date(u.Created_On).toLocaleString() : ""}</td>
                         <td>{u.Last_Active ? new Date(u.Last_Active).toLocaleString() : ""}</td>
+                        <td>
+                          {u.Role === 'Doctor' ? (
+                            <button
+                              className={`${tableStyles.actionBtn} ${tableStyles.deleteBtn}`}
+                              style={{ padding: '4px 8px', fontSize: 12 }}
+                              onClick={() => handleDelete(u.User_ID, u.Role)}
+                            >
+                              Delete
+                            </button>
+                          ) : (
+                            <span style={{ color: '#888', fontSize: 12 }}>-</span>
+                          )}
+                        </td>
                       </tr>
                     ))}
                   </tbody>
