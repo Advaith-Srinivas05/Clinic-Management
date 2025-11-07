@@ -15,6 +15,14 @@ export default function Login() {
       const res = await login(username, password);
       localStorage.setItem("token", res.token);
       localStorage.setItem("role", res.role);
+      if (res.doctorId != null) {
+        localStorage.setItem("doctorId", String(res.doctorId));
+      }
+      // store a minimal user object for components that expect it
+      localStorage.setItem(
+        "user",
+        JSON.stringify({ role: res.role, doctorId: res.doctorId ?? null })
+      );
 
       if (res.role === "FrontDesk") navigate("/frontdesk/appointments");
       else if (res.role === "Doctor") navigate("/doctor/dashboard");
