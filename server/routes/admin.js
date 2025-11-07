@@ -26,13 +26,93 @@ router.post('/create-doctor', async (req, res) => {
   }
 });
 
+// Admin: list doctors (for selecting when creating doctor logins)
+router.get('/doctors', async (_req, res) => {
+  try {
+    const [rows] = await pool.query(`SELECT Doctor_ID, Name FROM Doctor ORDER BY Name`);
+    res.json(rows);
+  } catch (err) {
+    res.status(500).json({ error: 'Server error' });
+  }
+});
+
+// Admin: search doctors by name or numeric id
+router.get('/doctors/search', async (req, res) => {
+  const q = (req.query.q || '').trim();
+  if (!q) return res.json([]);
+  try {
+    const where = [];
+    const params = [];
+    if (/^\d+$/.test(q)) { where.push('Doctor_ID = ?'); params.push(parseInt(q, 10)); }
+    where.push('Name LIKE ?'); params.push(`%${q}%`);
+    const sql = `SELECT Doctor_ID, Name FROM Doctor WHERE ${where.join(' OR ')} ORDER BY Name`;
+    const [rows] = await pool.query(sql, params);
+    res.json(rows);
+  } catch (err) {
+    res.status(500).json({ error: 'Server error' });
+  }
+});
+
 // Admin: get login table
 router.get('/logins', async (req, res) => {
   try {
-    const sql = `SELECT l.User_ID, l.Username, l.Role, l.Doctor_ID, l.Created_On, l.Last_Active, d.Name as DoctorName FROM Login l LEFT JOIN Doctor d ON l.Doctor_ID = d.Doctor_ID ORDER BY l.Role`;
+    const sql = `
+      SELECT 
+        l.User_ID, l.Username, l.Role, l.Doctor_ID, l.Created_On, l.Last_Active,
+        d.Name as DoctorName, d.Phone_Number as DoctorPhone, d.Email_Id as DoctorEmail, d.Qualifications as DoctorQualifications
+      FROM Login l 
+      LEFT JOIN Doctor d ON l.Doctor_ID = d.Doctor_ID 
+      ORDER BY l.Role, l.Username
+    `;
     const [rows] = await pool.query(sql);
     res.json(rows);
   } catch (err) { res.status(500).json({ error: 'Server error' }); }
+});
+
+// Admin: search logins by username/role/doctor name or numeric User_ID
+router.get('/logins/search', async (req, res) => {
+  const q = (req.query.q || '').trim();
+  if (!q) return res.json([]);
+  try {
+    const params = [];
+    const where = [];
+    // numeric User_ID exact
+    if (/^\d+$/.test(q)) { where.push('l.User_ID = ?'); params.push(parseInt(q, 10)); }
+    // username/role/doctor name LIKE
+    where.push('l.Username LIKE ?'); params.push(`%${q}%`);
+    where.push('l.Role LIKE ?'); params.push(`%${q}%`);
+    where.push('d.Name LIKE ?'); params.push(`%${q}%`);
+    where.push('d.Email_Id LIKE ?'); params.push(`%${q}%`);
+    where.push('d.Phone_Number LIKE ?'); params.push(`%${q}%`);
+    where.push('d.Qualifications LIKE ?'); params.push(`%${q}%`);
+    const sql = `
+      SELECT 
+        l.User_ID, l.Username, l.Role, l.Doctor_ID, l.Created_On, l.Last_Active,
+        d.Name as DoctorName, d.Phone_Number as DoctorPhone, d.Email_Id as DoctorEmail, d.Qualifications as DoctorQualifications
+      FROM Login l LEFT JOIN Doctor d ON l.Doctor_ID = d.Doctor_ID
+      WHERE ${where.join(' OR ')}
+      ORDER BY l.Role, l.Username
+    `;
+    const [rows] = await pool.query(sql, params);
+    res.json(rows);
+  } catch (err) { res.status(500).json({ error: 'Server error' }); }
+});
+
+// Admin: create a generic user (Admin/FrontDesk/Doctor with optional Doctor_ID)
+router.post('/users', async (req, res) => {
+  try {
+    const { username, password, doctorId } = req.body || {};
+    if (!username || !password) return res.status(400).json({ error: 'username and password are required' });
+    if (!doctorId) return res.status(400).json({ error: 'doctorId is required to create Doctor users' });
+    const hash = await bcrypt.hash(password, 10);
+    // Force role to 'Doctor' always
+    await pool.query(`INSERT INTO Login (Username, Password_Hash, Role, Doctor_ID) VALUES (?, ?, 'Doctor', ?)`, [username, hash, doctorId]);
+    res.json({ ok: true });
+  } catch (err) {
+    if (err && err.code === 'ER_DUP_ENTRY') return res.status(400).json({ error: 'Username already exists' });
+    console.error(err);
+    res.status(500).json({ error: 'Server error' });
+  }
 });
 
 // Admin: get login attempts (activity)
