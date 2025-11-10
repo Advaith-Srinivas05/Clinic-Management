@@ -16,6 +16,8 @@ export default function PatientFormModal({ onClose, onSubmit, editData }) {
     Profession: "",
     Portfolio: "",
   });
+  // BMI state for display
+  const [bmi, setBmi] = useState("");
 
   // Initialize form with editData if it exists
   useEffect(() => {
@@ -24,7 +26,6 @@ export default function PatientFormModal({ onClose, onSubmit, editData }) {
       const formattedDate = editData.DOB 
         ? new Date(editData.DOB).toISOString().split('T')[0]
         : '';
-      
       setForm({
         Name: editData.Name || "",
         DOB: formattedDate,
@@ -38,6 +39,11 @@ export default function PatientFormModal({ onClose, onSubmit, editData }) {
         Profession: editData.Profession || "",
         Portfolio: editData.Portfolio || "",
       });
+      if (editData.BMI !== undefined && editData.BMI !== null && editData.BMI !== "") {
+        setBmi(Number(editData.BMI).toFixed(2));
+      } else {
+        setBmi("");
+      }
     }
   }, [editData]);
 
@@ -150,25 +156,38 @@ export default function PatientFormModal({ onClose, onSubmit, editData }) {
               </div>
             </div>
 
-            <div className={styles.set}>
-              <div>
+            <div className={styles.set} style={{ display: 'flex', gap: '12px' }}>
+              <div style={{ flex: 1, minWidth: 0 }}>
                 <label htmlFor="Height">Height (cm)</label>
                 <input
                   type="number"
                   name="Height"
                   value={form.Height}
                   onChange={handleChange}
+                  style={{ width: '100%' }}
                 />
               </div>
-              <div>
+              <div style={{ flex: 1, minWidth: 0 }}>
                 <label htmlFor="Weight">Weight (kg)</label>
                 <input
                   type="number"
                   name="Weight"
                   value={form.Weight}
                   onChange={handleChange}
+                  style={{ width: '100%' }}
                 />
               </div>
+              {editData && (
+                <div style={{ flex: 1, minWidth: 0 }}>
+                  <label htmlFor="BMI">BMI (auto-calculated)</label>
+                  <input
+                    name="BMI"
+                    value={bmi}
+                    readOnly
+                    style={{ width: '100%', background: '#f5f5f5', color: '#333' }}
+                  />
+                </div>
+              )}
             </div>
 
             <div className={styles.set}>
