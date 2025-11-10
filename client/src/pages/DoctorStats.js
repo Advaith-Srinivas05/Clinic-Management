@@ -120,32 +120,36 @@ export default function DoctorStats({ user }) {
                 )}
               </div>
 
-              <div className={styles.card} style={{ gridColumn: '1 / -1' }}>
-                <div className={cardStyles.title}>Recent Appointments:</div>
-                <div className={styles.cardBody}>
+              <div className={cardStyles.box} style={{ 
+                gridColumn: '1 / -1',
+                marginTop: '1rem',
+                '--bgsize': '0'
+              }}>
+                <h2 className={cardStyles.title}>Recent Appointments</h2>
+                <div style={{ height: '400px', overflow: 'auto' }}>
                   {Array.isArray(s.recentAppointments) && s.recentAppointments.length > 0 ? (
-                    <div className={tableStyles.tableWrapper}>
-                      <div className={tableStyles.scrollContainer}>
-                        <table className={tableStyles.table}>
+                    <div className={tableStyles.tableWrapper} style={{ margin: '0' }}>
+                      <div className={tableStyles.scrollContainer} style={{ width: '100%' }}>
+                        <table className={tableStyles.table} style={{ width: '100%', tableLayout: 'fixed' }}>
                           <thead>
                             <tr>
-                              <th>ID</th>
-                              <th>Date</th>
-                              <th>Time</th>
-                              <th>Status</th>
-                              <th>Patient</th>
-                              <th>Cause</th>
+                              <th style={{ width: '8%' }}>ID</th>
+                              <th style={{ width: '15%' }}>Date</th>
+                              <th style={{ width: '12%' }}>Time</th>
+                              <th style={{ width: '15%' }}>Status</th>
+                              <th style={{ width: '20%' }}>Patient</th>
+                              <th style={{ width: '30%' }}>Cause</th>
                             </tr>
                           </thead>
                           <tbody>
                             {s.recentAppointments.map((a) => (
                               <tr key={a.Appt_ID}>
-                                <td>{a.Appt_ID}</td>
-                                <td>{a.Date ? new Date(a.Date).toLocaleDateString('en-GB') : ''}</td>
-                                <td>{a.Time}</td>
-                                <td>{a.Status}</td>
-                                <td>{a.PatientName}</td>
-                                <td>{a.Cause_of_Visit}</td>
+                                <td style={{ textOverflow: 'ellipsis', overflow: 'hidden', whiteSpace: 'nowrap' }}>{a.Appt_ID}</td>
+                                <td style={{ textOverflow: 'ellipsis', overflow: 'hidden', whiteSpace: 'nowrap' }}>{a.Date ? new Date(a.Date).toLocaleDateString('en-GB') : ''}</td>
+                                <td style={{ textOverflow: 'ellipsis', overflow: 'hidden', whiteSpace: 'nowrap' }}>{a.Time}</td>
+                                <td style={{ textOverflow: 'ellipsis', overflow: 'hidden', whiteSpace: 'nowrap' }}>{a.Status}</td>
+                                <td style={{ textOverflow: 'ellipsis', overflow: 'hidden', whiteSpace: 'nowrap' }}>{a.PatientName}</td>
+                                <td style={{ textOverflow: 'ellipsis', overflow: 'hidden', whiteSpace: 'nowrap' }}>{a.Cause_of_Visit}</td>
                               </tr>
                             ))}
                           </tbody>
@@ -153,7 +157,7 @@ export default function DoctorStats({ user }) {
                       </div>
                     </div>
                   ) : (
-                    <div className={tableStyles.empty}>No recent appointments</div>
+                    <div className={tableStyles.empty} style={{ textAlign: 'center' }}>No recent appointments</div>
                   )}
                 </div>
               </div>

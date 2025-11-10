@@ -2,17 +2,19 @@
   --borderradius: 14px;
   --bgsize: 0.38rem;
   padding: 1rem;
-  border: 1px solid;
+  border: 1px solid rgba(0, 0, 0, 0.1);
   position: relative;
   background: white;
   border-radius: var(--borderradius, 14px);
   transform: translateY(-2px);
   z-index: 2;
-  transition: transform 0.2s ease;
+  transition: transform 0.2s ease, box-shadow 0.2s ease;
+  box-shadow: 0.75rem 0.75rem 0 -2px rgba(0, 0, 0, 0.1);
 }
 
 .box:hover {
   transform: translateY(-4px);
+  box-shadow: 1rem 1rem 0 -2px rgba(0, 0, 0, 0.1);
 }
 
 .box::before,
@@ -68,7 +70,6 @@
   margin-left: 0.5rem;
 }
 
-.cardHeader{
-    padding-bottom: 10px;
-    text-transform: capitalize;
-}
+/* .recent{
+    margin-bottom: 10px;
+} */
