@@ -11,11 +11,7 @@ router.post('/', async (req, res) => {
     await conn.beginTransaction();
     const insSql = `INSERT INTO Prescription (Appt_ID, Doctor_ID, Patient_ID, Prescription, Medicine_ID) VALUES (?, ?, ?, ?, ?)`;
     const [r] = await conn.query(insSql, [Appt_ID, Doctor_ID, Patient_ID, Prescription, Medicine_ID]);
-
-    if (Medicine_ID) {
-      const updSql = `UPDATE Medicine SET Stock_Left = Stock_Left - 1 WHERE Medicine_ID = ? AND Stock_Left > 0`;
-      await conn.query(updSql, [Medicine_ID]);
-    }
+    // Stock reduction is handled by DB trigger on Prescription insert
     // attach prescription id to appointment
     await conn.query(`UPDATE Appointments SET Prescription_ID = ? WHERE Appt_ID = ?`, [r.insertId, Appt_ID]);
 
