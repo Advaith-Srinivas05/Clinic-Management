@@ -25,12 +25,12 @@ router.get('/', async (req, res) => {
   if (date) { conditions.push('a.Date = ?'); params.push(date); }
 
   const where = conditions.length ? ('WHERE ' + conditions.join(' AND ')) : '';
-  const sql = `SELECT a.*, p.Name AS PatientName, d.Name AS DoctorName
-               FROM Appointments a
-               LEFT JOIN Patient p ON a.Patient_ID = p.Patient_ID
-               LEFT JOIN Doctor d ON a.Doctor_ID = d.Doctor_ID
-               ${where}
-               ORDER BY a.Date, a.Time`;
+    const sql = `SELECT a.*, p.Name AS PatientName, d.Name AS DoctorName
+                 FROM Appointments a
+                 INNER JOIN Patient p ON a.Patient_ID = p.Patient_ID
+                 INNER JOIN Doctor d ON a.Doctor_ID = d.Doctor_ID
+                 ${where}
+                 ORDER BY a.Date, a.Time`;
   try {
     const [rows] = await pool.query(sql, params);
     res.json(rows);
@@ -86,8 +86,8 @@ router.get("/search", async (req, res) => {
         d.Name AS DoctorName,
         MATCH(p.Name) AGAINST(? IN NATURAL LANGUAGE MODE) AS relevance
       FROM Appointments a
-      LEFT JOIN Patient p ON a.Patient_ID = p.Patient_ID
-      LEFT JOIN Doctor d ON a.Doctor_ID = d.Doctor_ID
+      INNER JOIN Patient p ON a.Patient_ID = p.Patient_ID
+      INNER JOIN Doctor d ON a.Doctor_ID = d.Doctor_ID
       WHERE MATCH(p.Name) AGAINST(? IN NATURAL LANGUAGE MODE)
       ORDER BY relevance DESC, a.Date ASC, a.Time ASC;
     `;
@@ -99,8 +99,8 @@ router.get("/search", async (req, res) => {
         SELECT 
           a.*, p.Name AS PatientName, d.Name AS DoctorName
         FROM Appointments a
-        LEFT JOIN Patient p ON a.Patient_ID = p.Patient_ID
-        LEFT JOIN Doctor d ON a.Doctor_ID = d.Doctor_ID
+        INNER JOIN Patient p ON a.Patient_ID = p.Patient_ID
+        INNER JOIN Doctor d ON a.Doctor_ID = d.Doctor_ID
         WHERE p.Name LIKE ?
         ORDER BY a.Date ASC, a.Time ASC;
       `;
