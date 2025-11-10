@@ -12,8 +12,8 @@ router.post('/', async (req, res) => {
     const insSql = `INSERT INTO Payments (Appt_ID, Patient_ID, Date, Time, Amount, Mode_of_payment, Prescription_ID) VALUES (?, ?, ?, ?, ?, ?, ?)`;
     const [r] = await conn.query(insSql, [Appt_ID, Patient_ID, Date, Time, Amount, Mode_of_payment, Prescription_ID]);
 
-    // Update appointment
-    await conn.query(`UPDATE Appointments SET Status='Completed', Payment_ID = ? WHERE Appt_ID = ?`, [r.insertId, Appt_ID]);
+    // Link payment to appointment; Status will be set by DB trigger
+    await conn.query(`UPDATE Appointments SET Payment_ID = ? WHERE Appt_ID = ?`, [r.insertId, Appt_ID]);
 
     await conn.commit();
     const [rows] = await pool.query(`SELECT * FROM Payments WHERE Payment_ID = ?`, [r.insertId]);
