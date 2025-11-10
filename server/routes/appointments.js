@@ -89,22 +89,7 @@ router.get("/search", async (req, res) => {
       WHERE MATCH(p.Name) AGAINST(? IN NATURAL LANGUAGE MODE)
       ORDER BY relevance DESC, a.Date ASC, a.Time ASC;
     `;
-
     const [rows] = await pool.query(sql, [q, q]);
-    if (rows.length === 0) {
-      // fallback if FULLTEXT not supported
-      const likeSql = `
-        SELECT 
-          a.*, p.Name AS PatientName, d.Name AS DoctorName
-        FROM Appointments a
-        INNER JOIN Patient p ON a.Patient_ID = p.Patient_ID
-        INNER JOIN Doctor d ON a.Doctor_ID = d.Doctor_ID
-        WHERE p.Name LIKE ?
-        ORDER BY a.Date ASC, a.Time ASC;
-      `;
-      const [likeRows] = await pool.query(likeSql, [`%${q}%`]);
-      return res.json(likeRows);
-    }
     res.json(rows);
   } catch (err) {
     console.error("Error searching appointments:", err);
