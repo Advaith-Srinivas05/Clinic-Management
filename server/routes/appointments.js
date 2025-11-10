@@ -77,8 +77,6 @@ router.get("/search", async (req, res) => {
     return res.status(400).json({ error: "Query parameter 'q' required" });
 
   try {
-    // If FULLTEXT is available (recommended):
-    // CREATE FULLTEXT INDEX idx_patient_name ON Patient(Name);
     const sql = `
       SELECT 
         a.*, 
