@@ -24,7 +24,7 @@ router.get('/search', async (req, res) => {
       return res.json(rows);
     }
 
-    // Try FULLTEXT relevance on selected text columns
+    // FULLTEXT relevance on selected text columns
     const fulltextSql = `
       SELECT 
         m.*, 
@@ -33,22 +33,8 @@ router.get('/search', async (req, res) => {
       WHERE MATCH(m.Med_Name, m.Brand, m.Supplier, m.Type_of_Medicine) AGAINST(? IN NATURAL LANGUAGE MODE)
       ORDER BY relevance DESC, m.Medicine_ID ASC;
     `;
-    try {
-      const [rows] = await pool.query(fulltextSql, [q, q]);
-      if (rows.length > 0) return res.json(rows);
-    } catch (e) {
-      // likely missing FULLTEXT index; fall back to LIKE
-    }
-
-    const like = `%${q}%`;
-    const likeSql = `
-      SELECT m.*
-      FROM Medicine m
-      WHERE m.Med_Name LIKE ? OR m.Brand LIKE ? OR m.Supplier LIKE ? OR m.Type_of_Medicine LIKE ?
-      ORDER BY m.Medicine_ID ASC;
-    `;
-    const [likeRows] = await pool.query(likeSql, [like, like, like, like]);
-    return res.json(likeRows);
+    const [rows] = await pool.query(fulltextSql, [q, q]);
+    return res.json(rows);
   } catch (err) {
     console.error('Error searching medicines:', err);
     res.status(500).json({ error: 'Server error while searching medicines' });
