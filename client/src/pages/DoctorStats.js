@@ -3,6 +3,7 @@ import DoctorNavbar from '../components/DoctorNavbar';
 import { doctors } from '../api';
 import styles from '../css/FrontdeskDashboard.module.css';
 import tableStyles from '../css/AppointmentList.module.css';
+import cardStyles from '../css/StatsCard.module.css';
 
 export default function DoctorStats({ user }) {
   const storedDoctorId = typeof window !== 'undefined' ? localStorage.getItem('doctorId') : null;
@@ -56,50 +57,71 @@ export default function DoctorStats({ user }) {
           ) : error ? (
             <div style={{ padding: '20px', color: 'red' }}>{error}</div>
           ) : (
-            <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(220px, 1fr))', gap: 16 }}>
-              <div className={styles.card}>
-                <div className={styles.cardHeader}>Appointments</div>
-                <div className={styles.cardBody}>
-                  <div>Scheduled: <b>{t.Scheduled || 0}</b></div>
-                  <div>Completed: <b>{t.Completed || 0}</b></div>
-                  <div>Cancelled: <b>{t.Cancelled || 0}</b></div>
-                </div>
+            <div style={{ 
+              display: 'grid', 
+              gridTemplateColumns: 'repeat(4, 1fr)', 
+              gap: '2rem',
+              padding: '1rem'
+            }}>
+              <div className={cardStyles.box}>
+                <h2 className={cardStyles.title}>Appointments</h2>
+                <ul className={cardStyles.list}>
+                  <li className={cardStyles.listItem}>
+                    Scheduled<span className={cardStyles.value}>{t.Scheduled || 0}</span>
+                  </li>
+                  <li className={cardStyles.listItem}>
+                    Completed<span className={cardStyles.value}>{t.Completed || 0}</span>
+                  </li>
+                  <li className={cardStyles.listItem}>
+                    Cancelled<span className={cardStyles.value}>{t.Cancelled || 0}</span>
+                  </li>
+                </ul>
               </div>
 
-              <div className={styles.card}>
-                <div className={styles.cardHeader}>Patients</div>
-                <div className={styles.cardBody}>
-                  <div>Unique Patients: <b>{s.uniquePatients || 0}</b></div>
-                  <div>Avg Appts/Day (30d): <b>{Number(s.avgApptsPerDay || 0).toFixed(2)}</b></div>
-                </div>
+              <div className={cardStyles.box}>
+                <h2 className={cardStyles.title}>Patients</h2>
+                <ul className={cardStyles.list}>
+                  <li className={cardStyles.listItem}>
+                    Unique Patients<span className={cardStyles.value}>{s.uniquePatients || 0}</span>
+                  </li>
+                  <li className={cardStyles.listItem}>
+                    Avg Appts/Day (30d)<span className={cardStyles.value}>{Number(s.avgApptsPerDay || 0).toFixed(2)}</span>
+                  </li>
+                </ul>
               </div>
 
-              <div className={styles.card}>
-                <div className={styles.cardHeader}>Revenue</div>
-                <div className={styles.cardBody}>
-                  <div>Total: <b>₹{Number(s.revenue || 0).toFixed(2)}</b></div>
-                  <div>Upcoming Today: <b>{s.upcomingToday || 0}</b></div>
-                  <div>Upcoming (7d): <b>{s.upcomingWeek || 0}</b></div>
-                </div>
+              <div className={cardStyles.box}>
+                <h2 className={cardStyles.title}>Revenue</h2>
+                <ul className={cardStyles.list}>
+                  <li className={cardStyles.listItem}>
+                    Total<span className={cardStyles.value}>₹{Number(s.revenue || 0).toFixed(2)}</span>
+                  </li>
+                  <li className={cardStyles.listItem}>
+                    Upcoming Today<span className={cardStyles.value}>{s.upcomingToday || 0}</span>
+                  </li>
+                  <li className={cardStyles.listItem}>
+                    Upcoming (7d)<span className={cardStyles.value}>{s.upcomingWeek || 0}</span>
+                  </li>
+                </ul>
               </div>
 
-              <div className={styles.card}>
-                <div className={styles.cardHeader}>Top Medicines</div>
-                <div className={styles.cardBody}>
-                  {Array.isArray(s.topMedicines) && s.topMedicines.length > 0 ? (
-                    <ul style={{ margin: 0, paddingLeft: 18 }}>
-                      {s.topMedicines.map((m, idx) => (
-                        <li key={idx}>{m.Med_Name} — {m.count}</li>
-                      ))}
-                    </ul>
-                  ) : (
-                    <div className={tableStyles.empty}>No data</div>
-                  )}
-                </div>
+              <div className={cardStyles.box}>
+                <h2 className={cardStyles.title}>Top Medicines</h2>
+                {Array.isArray(s.topMedicines) && s.topMedicines.length > 0 ? (
+                  <ul className={cardStyles.list}>
+                    {s.topMedicines.map((m, idx) => (
+                      <li key={idx} className={cardStyles.listItem}>
+                        {m.Med_Name}<span className={cardStyles.value}>{m.count}</span>
+                      </li>
+                    ))}
+                  </ul>
+                ) : (
+                  <div className={tableStyles.empty}>No data</div>
+                )}
               </div>
 
               <div className={styles.card} style={{ gridColumn: '1 / -1' }}>
-                <div className={styles.cardHeader}>Recent Appointments</div>
+                <div className={cardStyles.title}>Recent Appointments:</div>
                 <div className={styles.cardBody}>
                   {Array.isArray(s.recentAppointments) && s.recentAppointments.length > 0 ? (
                     <div className={tableStyles.tableWrapper}>
